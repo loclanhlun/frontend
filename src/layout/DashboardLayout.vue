@@ -7,9 +7,29 @@
         <p>Dashboard</p>
       </sidebar-link>
      
-      <sidebar-link to="/admin/table-list">
+      <sidebar-link to="/admin/commodity-list">
         <i class="nc-icon nc-notes"></i>
-        <p>Table list</p>
+        <p>Commodity list</p>
+      </sidebar-link>
+
+      <sidebar-link to="/admin/category-list">
+        <i class="nc-icon nc-notes"></i>
+        <p>Category List</p>
+      </sidebar-link>
+
+      <sidebar-link to="/admin/supplier-list">
+        <i class="nc-icon nc-notes"></i>
+        <p>Supplier List</p>
+      </sidebar-link>
+
+      <sidebar-link to="/admin/warehouse-list">
+        <i class="nc-icon nc-notes"></i>
+        <p>Warehouse List</p>
+      </sidebar-link>
+
+      <sidebar-link to="/admin/agency-list">
+        <i class="nc-icon nc-notes"></i>
+        <p>Agency List</p>
       </sidebar-link>
  
       
