@@ -165,27 +165,14 @@
                               required
                             ></b-form-input>
                           </b-form-group>
-                            <b-form-group
-                                id="input-group-3"
-                                label="Loại hàng"
-                                label-for="input-3"
-                                  v-model="editform.categoryid"
+                            <b-form-select
+                                v-model="editform.categoryId"
+                                  :options="categoryOptions"
+                                  value-field="id"
+                                  text-field="name"
                               >
-                                <select 
-                                  class="custom-select"
-                                   
-                                >
-                              
-                                  <option
-                                  
-                                    v-for="meterial in meterials"
-                                    :key="meterial.id"
-                                    :value="meterial.id"
-                                  >
-                                    {{ meterial.name }}
-                                  </option>
-                                </select>
-                              </b-form-group>
+                                
+                              </b-form-select>
                           <b-form-group
                             id="input-group-1"
                             label="Trạng thái"
@@ -263,7 +250,8 @@ export default {
         id : "",
         name: "",
         code:"",
-        categoryid: "",
+        categoryId: "",
+        categoryName: "",
         status:""
       },
 
@@ -299,8 +287,8 @@ export default {
       items: [],
       
       
-      
-    meterials:[],
+    selectedCategory: null,
+    categoryOptions:[],
     
     status:[]
     };
@@ -339,7 +327,7 @@ export default {
         .then((response) => response.data)
         .then((res) => {
          
-          this.meterials = res.object
+          this.categoryOptions = res.object
           
         });
     },
@@ -428,17 +416,19 @@ export default {
         .get(`http://localhost:9090/rest/v1/commodity/` + id)
         .then((res) => res.data)
         .then((response) => {
-        
+          console.log('response', response);
           this.editform.id = response.object.id;
           this.editform.name = response.object.name;
           this.editform.code = response.object.code;
-          this.editform.categoryid = response.object.categoryName;
+          this.editform.categoryName = response.object.categoryName,
+          this.editform.categoryId = response.object.categoryId;
           this.editform.status = response.object.status;
             console.log(this.editform.id);
         });
     },
     update() {
-     
+    // console.log(this.editform);
+    // console.log('selectedCategory', this.selectedCategory);
       axios 
         .put(
           `http://localhost:9090/rest/v1/commodity/edit-commodity`, this.editform,{},
