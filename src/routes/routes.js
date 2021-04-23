@@ -10,6 +10,7 @@ import CategoryList from 'src/pages/CategoryList.vue'
 import SupplierList from 'src/pages/SupplierList.vue'
 import WarehouseList from 'src/pages/WarehouseList.vue'
 import AgencyList from 'src/pages/AgencyList.vue'
+import UserList from 'src/pages/UserList.vue'
 import Typography from 'src/pages/Typography.vue'
 import Icons from 'src/pages/Icons.vue'
 import Maps from 'src/pages/Maps.vue'
@@ -65,6 +66,11 @@ const routes = [
         path: 'agency-list',
         name: 'Agency List',
         component: AgencyList
+      },
+      {
+        path: 'user-list',
+        name: 'User List',
+        component: UserList
       },
       {
         path: 'typography',

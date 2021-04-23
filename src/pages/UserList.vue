@@ -5,7 +5,7 @@
         <b-col lg="12">
           <card>
             <div class="items-click-add">
-              <h3>Danh sách nguyên liệu</h3>
+              <h3>Danh sách Người dùng</h3>
               <div>
                 <div class="pseudo-search">
                   <!--   @keyup="onSeach()"
@@ -23,47 +23,95 @@
                   >Thêm mới</b-button
                 >
 
-                <b-modal id="modal-1" title="Thêm hành hóa" ref="ModalAdd">
+                <b-modal id="modal-1" title="Thêm người dùng" ref="ModalAdd">
                   <div>
                     <b-form @submit="onSubmit" v-if="show">
                       <b-form-group
                         id="input-group-1"
-                        label="Mã hàng hóa"
+                        label="Họ và tên"
                         label-for="input-1"
                       >
                         <b-form-input
                           id="input-1"
-                          v-model="form.code"
-                          placeholder="Nhập mã hàng hóa"
+                          v-model="form.fullName"
+                          placeholder="Nhập họ và tên"
                           required
                         ></b-form-input>
                       </b-form-group>
                       <b-form-group
                         id="input-group-1"
-                        label="Tên hàng hóa"
+                        label="Email"
                         label-for="input-1"
                       >
                         <b-form-input
                           id="input-1"
-                          v-model="form.name"
-                          placeholder="Nhập tên hàng hóa"
+                          v-model="form.email"
+                          type="email"
+                          placeholder="Nhập email"
                           required
                         ></b-form-input>
                       </b-form-group>
                       <b-form-group
-                            id="input-group-1"
-                            label="Loại hàng"
-                            label-for="input-1"
-                          >
-                            <b-form-select
-                              v-model="form.categoryid"
-                              :options="categoryOptions"
-                              value-field="id"
-                              text-field="name"
-                            >
-                            </b-form-select>
-                          </b-form-group>
-
+                        id="input-group-1"
+                        label="Mật khẩu"
+                        label-for="input-1"
+                      >
+                        <b-form-input
+                          id="input-1"
+                          v-model="form.password"
+                          type="password"
+                          placeholder="Nhập mật khẩu"
+                          required
+                        ></b-form-input>
+                      </b-form-group>
+                      <b-form-group
+                        id="input-group-1"
+                        label="Địa chỉ"
+                        label-for="input-1"
+                      >
+                        <b-form-input
+                          id="input-1"
+                          v-model="form.address"
+                          placeholder="Nhập địa chỉ"
+                          required
+                        ></b-form-input>
+                      </b-form-group>
+                      <b-form-group
+                        id="input-group-1"
+                        label="Số điện thoại"
+                        label-for="input-1"
+                      >
+                        <b-form-input
+                          id="input-1"
+                          v-model="form.phoneNumber"
+                          placeholder="Nhập số điện thoại"
+                          required
+                        ></b-form-input>
+                      </b-form-group>
+                      <b-form-group
+                        id="input-group-1"
+                        label="Giới tính"
+                        label-for="input-1"
+                      >
+                        <b-form-select
+                          v-model="form.gender"
+                          :options="options2"
+                        >
+                        </b-form-select>
+                      </b-form-group>
+                      <b-form-group
+                        id="input-group-1"
+                        label="Loại người dùng"
+                        label-for="input-1"
+                      >
+                        <b-form-select
+                          v-model="form.roleCode"
+                          :options="RoleOptions"
+                          value-field="code"
+                          text-field="name"
+                        >
+                        </b-form-select>
+                      </b-form-group>
                       <b-button type="submit" variant="success"
                         >Xác Nhận</b-button
                       >
@@ -88,11 +136,26 @@
                       :current-page="currentPage"
                       :fields="fields"
                     >
+                      <template v-slot:cell(gender)="row">
+                        <b-badge v-if="row.item.gender" variant="success">Nữ</b-badge
+                        >
+                        <b-badge v-else variant="warning">Nam</b-badge>
+                      </template>
                       <template #cell(actions)="row">
                         <b-button v-b-modal.my-modal @click="edit(row.item.id)">
                           Sửa
                         </b-button>
-                        <button @click="ItemDelete(row.item.id)">Xóa</button>
+                        <b-button @click="ItemDelete(row.item.id)">
+                          Xóa
+                        </b-button>
+                      </template>
+                      <template v-slot:cell(status)="row">
+                        <b-badge v-if="row.item.status" variant="success"
+                          >Không hoạt động</b-badge
+                        >
+                        <b-badge v-else variant="warning"
+                          >Hoạt Động</b-badge
+                        >
                       </template>
                     </b-table>
                     <b-card-footer class="py-4 d-flex justify-content-start">
@@ -119,54 +182,92 @@
                       <div>
                         <b-form @submit="update()" v-if="show">
                           <b-form-group
-                            id="input-group-1"
-                            label="Mã hàng hóa"
-                            label-for="input-1"
-                          >
-                            <b-form-input
-                              id="input-1"
-                              placeholder="Nhập mã hàng hóa"
-                              v-model="editform.code"
-                              required
-                            ></b-form-input>
-                          </b-form-group>
-                          <b-form-group
-                            id="input-group-1"
-                            label="Tên hành hóa"
-                            label-for="input-1"
-                          >
-                            <b-form-input
-                              id="input-1"
-                              placeholder="Nhập tên hàng hóa"
-                              v-model="editform.name"
-                              required
-                            ></b-form-input>
-                          </b-form-group>
-                          <b-form-group
-                            id="input-group-1"
-                            label="Loại hàng"
-                            label-for="input-1"
-                          >
-                            <b-form-select
-                              v-model="editform.categoryId"
-                              :options="categoryOptions"
-                              value-field="id"
-                              text-field="name"
-                            >
-                            </b-form-select>
-                          </b-form-group>
-
-                          <b-form-group
-                            id="input-group-1"
-                            label="Trạng thái"
-                            label-for="input-1"
-                          >
-                            <b-form-select
-                              v-model="editform.status"
-                              :options="options1"
-                            >
-                            </b-form-select>
-                          </b-form-group>
+                        id="input-group-1"
+                        label="Họ và tên"
+                        label-for="input-1"
+                      >
+                        <b-form-input
+                          id="input-1"
+                          v-model="editform.fullName"
+                          placeholder="Nhập họ và tên"
+                          required
+                        ></b-form-input>
+                      </b-form-group>
+                      <b-form-group
+                        id="input-group-1"
+                        label="Email"
+                        label-for="input-1"
+                      >
+                        <b-form-input
+                          id="input-1"
+                          v-model="editform.email"
+                          type="email"
+                          placeholder="Nhập email"
+                          required
+                        ></b-form-input>
+                      </b-form-group>
+                      <b-form-group
+                        id="input-group-1"
+                        label="Địa chỉ"
+                        label-for="input-1"
+                      >
+                        <b-form-input
+                          id="input-1"
+                          v-model="editform.address"
+                          placeholder="Nhập địa chỉ"
+                          required
+                        ></b-form-input>
+                      </b-form-group>
+                      <b-form-group
+                        id="input-group-1"
+                        label="Số điện thoại"
+                        label-for="input-1"
+                      >
+                        <b-form-input
+                          id="input-1"
+                          v-model="editform.phoneNumber"
+                          placeholder="Nhập số điện thoại"
+                          required
+                        ></b-form-input>
+                      </b-form-group>
+                      <b-form-group
+                        id="input-group-1"
+                        label="Giới tính"
+                        label-for="input-1"
+                      >
+                        <b-form-select
+                          v-model="editform.gender"
+                          :options="options2"
+                          value-field="value"
+                          text-field="text"
+                        >
+                        </b-form-select>
+                      </b-form-group>
+                      <b-form-group
+                        id="input-group-1"
+                        label="Loại người dùng"
+                        label-for="input-1"
+                      >
+                        <b-form-select
+                          v-model="editform.roleCode"
+                          :options="RoleOptions"
+                          value-field="code"
+                          text-field="name"
+                        >
+                        </b-form-select>
+                      </b-form-group>
+                      
+                      <b-form-group
+                        id="input-group-1"
+                        label="Trạng thái"
+                        label-for="input-1"
+                      >
+                        <b-form-select
+                          v-model="editform.status"
+                          :options="options1"
+                        >
+                        </b-form-select>
+                      </b-form-group>
 
                           <!-- Show Modal Nguyên Liệu -->
 
@@ -217,11 +318,18 @@ export default {
         meterial: "",
       },
 
+      selectedGender: null,
+      options2: [
+        { value: null, text: "Chọn giới tính" },
+        { value: 0, text: "Nam" },
+        { value: 1, text: "Nữ" },
+      ],
+
       selected: null,
       options1: [
-        { value: null, text: "Please select an option" },
-        { value: 0, text: "Còn giao dịch" },
-        { value: 1, text: "Ngừng giao dịch" },
+        { value: null, text: "Chọn giới tính" },
+        { value: 0, text: "Hoạt động" },
+        { value: 1, text: "Ngừng hoạt động" },
       ],
       isEdit: null,
       // projects,
@@ -231,16 +339,23 @@ export default {
       currentPage: 1,
 
       form: {
-        name: "",
-        code: "",
-        categoryid: "",
+        fullName: "",
+        email: "",
+        password: "",
+        gender: "",
+        address: "",
+        phoneNumber: "",
+        roleCode: "",
       },
       editform: {
         id: "",
-        name: "",
-        code: "",
-        categoryId: "",
-        categoryName: "",
+        fullName: "",
+        email: "",
+        password: "",
+        gender: "",
+        address: "",
+        phoneNumber: "",
+        roleCode: "",
         status: "",
       },
 
@@ -256,16 +371,32 @@ export default {
           label: "#",
         },
         {
-          key: "code",
+          key: "fullName",
+          label: "Họ tên",
         },
         {
-          key: "name",
+          key: "email",
+          label: "Email",
         },
         {
-          key: "categoryName",
+          key: "phoneNumber",
+          label: "Số điện thoại",
+        },
+        {
+          key: "address",
+          label: "Địa chỉ",
+        },
+        {
+          key: "gender",
+          label: "Giới tính",
+        },
+        {
+          key: "role",
+          label: "Loại Account",
         },
         {
           key: "status",
+          label: "Trạng thái",
         },
 
         { key: "actions", label: "Hành động" },
@@ -275,30 +406,38 @@ export default {
       // },
       items: [],
 
-      selectedCategory: null,
-      categoryOptions: [],
+      selectedRole: null,
+      RoleOptions: [],
 
       status: [],
     };
   },
   created() {
-    this.getMeterial();
-    this.getMeterial1();
+    this.getUser();
+    this.getRole();
+
     // setInterval(() => {
     //   this.onSeach();
     // }, 500);
   },
 
   methods: {
+    getRole() {
+      axios
+        .get(`http://localhost:9090/rest/v1/user/list-role`)
+        .then((response) => response.data)
+        .then((res) => {
+          this.RoleOptions = res.object;
+        });
+    },
     ItemDelete(id) {
-      const path =
-        `http://localhost:9090/rest/v1/commodity/remove-commodity/` + id;
+      const path = `http://localhost:9090/rest/v1/user/remove-user/` + id;
 
       axios
         .put(path)
         .then((res) => {
           console.log(res);
-          this.getMeterial();
+          this.getUser();
 
           // this.$toaster.success("Đã xóa nguyên liệu thành công");
 
@@ -310,14 +449,6 @@ export default {
         });
     },
 
-    getMeterial1() {
-      axios
-        .get(`http://localhost:9090/rest/v1/category/list`)
-        .then((response) => response.data)
-        .then((res) => {
-          this.categoryOptions = res.object;
-        });
-    },
     //SEARCH METERIAL
     // searchItem(payload) {
     //   const path = "http://127.0.0.1:8000/material/search_material/";
@@ -346,32 +477,35 @@ export default {
     //   this.searchItem(payload);
     // },
     // GET ALL METERIAL
-    getMeterial() {
+    getUser() {
       axios
-        .get(`http://localhost:9090/rest/v1/commodity/list`)
+        .get(`http://localhost:9090/rest/v1/user/list`)
         .then((response) => response.data)
         .then((res) => {
-          this.items = res.object.map((supplier) => {
+          this.items = res.object.map((user) => {
             return {
-              id: supplier.id,
-              code: supplier.code,
-              name: supplier.name,
-              categoryName: supplier.categoryName,
-              status: supplier.status,
+              id: user.id,
+              fullName: user.fullName,
+              email: user.email,
+              address: user.address,
+              phoneNumber: user.phoneNumber,
+              gender: user.gender,
+              role: user.roleName,
+              status: user.status,
             };
           });
         });
     },
     // ADD METERIAL
-    addMeterial(payload) {
-      const path = "http://localhost:9090/rest/v1/commodity/add-commodity";
+    addUser(payload) {
+      const path = "http://localhost:9090/rest/v1/user/add-user";
       axios
         .post(path, payload)
         .then((res) => {
-          this.getMeterial();
+          this.getUser();
         })
         .catch((error) => {
-          this.getMeterial();
+          this.getUser();
           console.log(error);
         });
     },
@@ -380,12 +514,17 @@ export default {
       event.preventDefault();
       this.$refs.ModalAdd.hide();
       const payload = {
-        code: this.form.code,
-        name: this.form.name,
-        categoryId: this.form.categoryid,
+        fullName: this.form.fullName,
+        email: this.form.email,
+        phoneNumber: this.form.phoneNumber,
+        address: this.form.address,
+        roleCode: this.form.roleCode,
+        password: this.form.password,
+        gender: this.form.gender,
+        status: this.form.status,
       };
 
-      this.addMeterial(payload);
+      this.addUser(payload);
       this.onReset();
       this.$refs["ModalAdd"].hide();
     },
@@ -393,25 +532,25 @@ export default {
     edit(id) {
       this.isEdit = id;
       axios
-        .get(`http://localhost:9090/rest/v1/commodity/` + id)
+        .get(`http://localhost:9090/rest/v1/user/` + id)
         .then((res) => res.data)
         .then((response) => {
           console.log("response", response);
           this.editform.id = response.object.id;
-          this.editform.name = response.object.name;
-          this.editform.code = response.object.code;
-          (this.editform.categoryName = response.object.categoryName),
-            (this.editform.categoryId = response.object.categoryId);
+          this.editform.fullName = response.object.fullName;
+          this.editform.email = response.object.email;
+          this.editform.phoneNumber = response.object.phoneNumber;
+          this.editform.roleCode = response.object.roleCode;
+          this.editform.address = response.object.address;
           this.editform.status = response.object.status;
+          this.editform.gender = response.object.gender;
           console.log(this.editform.id);
         });
     },
     update() {
-      // console.log(this.editform);
-      // console.log('selectedCategory', this.selectedCategory);
       axios
         .put(
-          `http://localhost:9090/rest/v1/commodity/edit-commodity`,
+          `http://localhost:9090/rest/v1/user/edit-user`,
           this.editform,
           {},
           console.log(this.isEdit, "Id Update"),
@@ -419,7 +558,7 @@ export default {
         )
         .then((res) => {
           console.log(res);
-          this.getMeterial();
+          this.getUser();
         })
         .catch((err) => {
           this.$refs.editSupModal.hide();
@@ -428,9 +567,13 @@ export default {
 
     onReset() {
       // Reset our form values
-      this.form.name = "";
-      this.form.code = "";
-      this.form.categoryid = "";
+      this.form.fullName = "";
+      this.form.email = "";
+      this.form.password = "";
+      this.form.gender = "";
+      this.form.phoneNumber = "";
+      this.form.roleCode = "";
+      this.form.address = "";
     },
     info(item, index, button) {
       this.infoModal.title = `Row index: ${index}`;
