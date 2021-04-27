@@ -17,6 +17,7 @@ import Maps from 'src/pages/Maps.vue'
 import Notifications from 'src/pages/Notifications.vue'
 import Upgrade from 'src/pages/Upgrade.vue'
 import Login from 'src/layout/Login.vue'
+import ImportBillList from 'src/pages/ImportBillList.vue'
 
 const routes = [
 
@@ -72,6 +73,7 @@ const routes = [
         name: 'User List',
         component: UserList
       },
+
       {
         path: 'typography',
         name: 'Typography',
@@ -96,6 +98,11 @@ const routes = [
         path: 'upgrade',
         name: 'Upgrade to PRO',
         component: Upgrade
+      },
+      {
+        path: 'import-bill',
+        name: 'Import List',
+        component: ImportBillList
       },
       
     ]

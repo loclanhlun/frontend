@@ -137,7 +137,8 @@
                       :fields="fields"
                     >
                       <template v-slot:cell(gender)="row">
-                        <b-badge v-if="row.item.gender" variant="success">Nữ</b-badge
+                        <b-badge v-if="row.item.gender" variant="success"
+                          >Nữ</b-badge
                         >
                         <b-badge v-else variant="warning">Nam</b-badge>
                       </template>
@@ -153,9 +154,7 @@
                         <b-badge v-if="row.item.status" variant="success"
                           >Không hoạt động</b-badge
                         >
-                        <b-badge v-else variant="warning"
-                          >Hoạt Động</b-badge
-                        >
+                        <b-badge v-else variant="warning">Hoạt Động</b-badge>
                       </template>
                     </b-table>
                     <b-card-footer class="py-4 d-flex justify-content-start">
@@ -171,6 +170,7 @@
 
                   <!-- Modal  -->
                   <b-modal
+                  size="lg"
                     id="my-modal"
                     ref="editSupModal"
                     title="Thông tin nguyên liệu"
@@ -181,93 +181,99 @@
                       <h2 style="text-align: center">Sửa Thể Loại</h2>
                       <div>
                         <b-form @submit="update()" v-if="show">
-                          <b-form-group
-                        id="input-group-1"
-                        label="Họ và tên"
-                        label-for="input-1"
-                      >
-                        <b-form-input
-                          id="input-1"
-                          v-model="editform.fullName"
-                          placeholder="Nhập họ và tên"
-                          required
-                        ></b-form-input>
-                      </b-form-group>
-                      <b-form-group
-                        id="input-group-1"
-                        label="Email"
-                        label-for="input-1"
-                      >
-                        <b-form-input
-                          id="input-1"
-                          v-model="editform.email"
-                          type="email"
-                          placeholder="Nhập email"
-                          required
-                        ></b-form-input>
-                      </b-form-group>
-                      <b-form-group
-                        id="input-group-1"
-                        label="Địa chỉ"
-                        label-for="input-1"
-                      >
-                        <b-form-input
-                          id="input-1"
-                          v-model="editform.address"
-                          placeholder="Nhập địa chỉ"
-                          required
-                        ></b-form-input>
-                      </b-form-group>
-                      <b-form-group
-                        id="input-group-1"
-                        label="Số điện thoại"
-                        label-for="input-1"
-                      >
-                        <b-form-input
-                          id="input-1"
-                          v-model="editform.phoneNumber"
-                          placeholder="Nhập số điện thoại"
-                          required
-                        ></b-form-input>
-                      </b-form-group>
-                      <b-form-group
-                        id="input-group-1"
-                        label="Giới tính"
-                        label-for="input-1"
-                      >
-                        <b-form-select
-                          v-model="editform.gender"
-                          :options="options2"
-                          value-field="value"
-                          text-field="text"
-                        >
-                        </b-form-select>
-                      </b-form-group>
-                      <b-form-group
-                        id="input-group-1"
-                        label="Loại người dùng"
-                        label-for="input-1"
-                      >
-                        <b-form-select
-                          v-model="editform.roleCode"
-                          :options="RoleOptions"
-                          value-field="code"
-                          text-field="name"
-                        >
-                        </b-form-select>
-                      </b-form-group>
-                      
-                      <b-form-group
-                        id="input-group-1"
-                        label="Trạng thái"
-                        label-for="input-1"
-                      >
-                        <b-form-select
-                          v-model="editform.status"
-                          :options="options1"
-                        >
-                        </b-form-select>
-                      </b-form-group>
+                          <b-row>
+                            <b-col>
+                              <b-form-group
+                                id="input-group-1"
+                                label="Họ và tên"
+                                label-for="input-1"
+                              >
+                                <b-form-input
+                                  id="input-1"
+                                  v-model="editform.fullName"
+                                  placeholder="Nhập họ và tên"
+                                  required
+                                ></b-form-input>
+                              </b-form-group>
+                              <b-form-group
+                                id="input-group-1"
+                                label="Email"
+                                label-for="input-1"
+                              >
+                                <b-form-input
+                                  id="input-1"
+                                  v-model="editform.email"
+                                  type="email"
+                                  placeholder="Nhập email"
+                                  required
+                                ></b-form-input>
+                              </b-form-group>
+                              <b-form-group
+                                id="input-group-1"
+                                label="Địa chỉ"
+                                label-for="input-1"
+                              >
+                                <b-form-input
+                                  id="input-1"
+                                  v-model="editform.address"
+                                  placeholder="Nhập địa chỉ"
+                                  required
+                                ></b-form-input>
+                              </b-form-group>
+                              <b-form-group
+                                id="input-group-1"
+                                label="Số điện thoại"
+                                label-for="input-1"
+                              >
+                                <b-form-input
+                                  id="input-1"
+                                  v-model="editform.phoneNumber"
+                                  placeholder="Nhập số điện thoại"
+                                  required
+                                ></b-form-input>
+                              </b-form-group>
+                            </b-col>
+
+                            <b-col>
+                              <b-form-group
+                                id="input-group-1"
+                                label="Giới tính"
+                                label-for="input-1"
+                              >
+                                <b-form-select
+                                  v-model="editform.gender"
+                                  :options="options2"
+                                  value-field="value"
+                                  text-field="text"
+                                >
+                                </b-form-select>
+                              </b-form-group>
+                              <b-form-group
+                                id="input-group-1"
+                                label="Loại người dùng"
+                                label-for="input-1"
+                              >
+                                <b-form-select
+                                  v-model="editform.roleCode"
+                                  :options="RoleOptions"
+                                  value-field="code"
+                                  text-field="name"
+                                >
+                                </b-form-select>
+                              </b-form-group>
+
+                              <b-form-group
+                                id="input-group-1"
+                                label="Trạng thái"
+                                label-for="input-1"
+                              >
+                                <b-form-select
+                                  v-model="editform.status"
+                                  :options="options1"
+                                >
+                                </b-form-select> </b-form-group
+                            ></b-col>
+                          </b-row>
 
                           <!-- Show Modal Nguyên Liệu -->
 
