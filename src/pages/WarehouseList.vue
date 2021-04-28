@@ -318,7 +318,7 @@ export default {
   methods: {
     ItemDelete(id) {
       const path =
-        `http://localhost:9090/rest/v1/warehouse/remove-warehouse/` + id;
+        `http://localhost:9090/rest/v1/warehouse/admin/remove-warehouse/` + id;
 
       axios
         .put(path)
@@ -366,7 +366,7 @@ export default {
     // GET ALL METERIAL
     getWarehouse() {
       axios
-        .get(`http://localhost:9090/rest/v1/warehouse/list`)
+        .get(`http://localhost:9090/rest/v1/admin/warehouse/list`)
         .then((response) => response.data)
         .then((res) => {
           this.items = res.object.map((warehouse) => {
@@ -383,7 +383,7 @@ export default {
     },
     // ADD METERIAL
     addWarehouse(payload) {
-      const path = "http://localhost:9090/rest/v1/warehouse/add-warehouse";
+      const path = "http://localhost:9090/rest/v1/admin/warehouse/add-warehouse";
       axios
         .post(path, payload)
         .then((res) => {
@@ -413,7 +413,7 @@ export default {
     edit(id) {
       this.isEdit = id;
       axios
-        .get(`http://localhost:9090/rest/v1/warehouse/` + id)
+        .get(`http://localhost:9090/rest/v1/admin/warehouse/` + id)
         .then((res) => res.data)
         .then((response) => {
           console.log("response", response);
@@ -429,7 +429,7 @@ export default {
     update() {
       axios
         .put(
-          `http://localhost:9090/rest/v1/warehouse/edit-warehouse`,
+          `http://localhost:9090/rest/v1/admin/warehouse/edit-warehouse`,
           this.editform,
           {},
           console.log(this.isEdit, "Id Update"),

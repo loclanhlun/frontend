@@ -40,7 +40,7 @@ actions : {
 login({commit}, username){
 return new Promise((resolve, reject) => {
 commit('auth_request')
-axios({url: 'http://localhost:9090/rest/v1/user/login', data: username, method: 'POST' })
+axios({url: 'http://localhost:9090/rest/v1/login', data: username, method: 'POST' })
 .then(resp => {
     console.log(resp.data);
 const { status_code, ...infor } = resp.data;

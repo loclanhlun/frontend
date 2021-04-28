@@ -195,6 +195,7 @@
 </template>
 <script>
 import axios from "axios";
+import Toasted from 'vue-toasted';
 import {
   Dropdown,
   DropdownItem,
@@ -256,16 +257,16 @@ export default {
           label: "#",
         },
         {
-          key: "code",
+          key: "code", label: "Mã hàng",
         },
         {
-          key: "name",
+          key: "name", label: "Tên hàng",
         },
         {
-          key: "categoryName",
+          key: "categoryName", label: "Loại hàng",
         },
         {
-          key: "status",
+          key: "status", label: "Trạng thái",
         },
 
         { key: "actions", label: "Hành động" },
@@ -282,8 +283,8 @@ export default {
     };
   },
   created() {
-    this.getMeterial();
-    this.getMeterial1();
+    this.getCommodity();
+    this.getCategory();
     // setInterval(() => {
     //   this.onSeach();
     // }, 500);
@@ -292,15 +293,16 @@ export default {
   methods: {
     ItemDelete(id) {
       const path =
-        `http://localhost:9090/rest/v1/commodity/remove-commodity/` + id;
+        `http://localhost:9090/rest/v1/admin/commodity/remove-commodity/` + id;
 
       axios
         .put(path)
+        .then((response) => response.data)
         .then((res) => {
           console.log(res);
-          this.getMeterial();
+          this.getCommodity();
 
-          // this.$toaster.success("Đã xóa nguyên liệu thành công");
+          this.$toaster.success(res.message);
 
           // this.message = 'Book removed!';
           // this.showMessage = true;
@@ -310,9 +312,9 @@ export default {
         });
     },
 
-    getMeterial1() {
+    getCategory() {
       axios
-        .get(`http://localhost:9090/rest/v1/category/list`)
+        .get(`http://localhost:9090/rest/v1/admin/category/list`)
         .then((response) => response.data)
         .then((res) => {
           this.categoryOptions = res.object;
@@ -346,12 +348,15 @@ export default {
     //   this.searchItem(payload);
     // },
     // GET ALL METERIAL
-    getMeterial() {
+    getCommodity() {
       axios
-        .get(`http://localhost:9090/rest/v1/commodity/list`)
+        .get(`http://localhost:9090/rest/v1/admin/commodity/list`)
         .then((response) => response.data)
         .then((res) => {
-          this.items = res.object.map((supplier) => {
+          if(res.resultCode == "401"){
+               this.$toaster.error("Vui lòng đăng nhập trước khi vào trang này!");
+          }else{
+            this.items = res.object.map((supplier) => {
             return {
               id: supplier.id,
               code: supplier.code,
@@ -359,19 +364,30 @@ export default {
               categoryName: supplier.categoryName,
               status: supplier.status,
             };
-          });
+            });
+          }
+        }).catch((error) => {
+          // this.getCommodity();
+         console.error();
+          this.$toaster.error("Bạn không có quyền truy cập vào trang này!");
         });
     },
     // ADD METERIAL
-    addMeterial(payload) {
-      const path = "http://localhost:9090/rest/v1/commodity/add-commodity";
+    addCommodity(payload) {
+      const path = "http://localhost:9090/rest/v1/admin/commodity/add-commodity";
       axios
         .post(path, payload)
+        .then((response) => response.data)
         .then((res) => {
-          this.getMeterial();
+         if(res.resultCode == "999"){
+            this.$toaster.error(res.message);
+         }else if(res.resultCode == "0"){
+            this.$toaster.success(res.message);
+         }
+          this.getCommodity();
         })
         .catch((error) => {
-          this.getMeterial();
+          this.getCommodity();
           console.log(error);
         });
     },
@@ -385,7 +401,7 @@ export default {
         categoryId: this.form.categoryid,
       };
 
-      this.addMeterial(payload);
+      this.addCommodity(payload);
       this.onReset();
       this.$refs["ModalAdd"].hide();
     },
@@ -393,7 +409,7 @@ export default {
     edit(id) {
       this.isEdit = id;
       axios
-        .get(`http://localhost:9090/rest/v1/commodity/` + id)
+        .get(`http://localhost:9090/rest/v1/admin/commodity/` + id)
         .then((res) => res.data)
         .then((response) => {
           console.log("response", response);
@@ -411,15 +427,14 @@ export default {
       // console.log('selectedCategory', this.selectedCategory);
       axios
         .put(
-          `http://localhost:9090/rest/v1/commodity/edit-commodity`,
+          `http://localhost:9090/rest/v1/admin/commodity/edit-commodity`,
           this.editform,
           {},
-          console.log(this.isEdit, "Id Update"),
-          console.log(this.editform, "Form")
         )
         .then((res) => {
           console.log(res);
-          this.getMeterial();
+          this.getCommodity();
+          this.$refs.editSupModal.hide();
         })
         .catch((err) => {
           this.$refs.editSupModal.hide();

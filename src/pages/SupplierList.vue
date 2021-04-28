@@ -318,7 +318,7 @@ export default {
   methods: {
     ItemDelete(id) {
       const path =
-        `http://localhost:9090/rest/v1/supplier/remove-supplier/` + id;
+        `http://localhost:9090/rest/v1/admin/supplier/remove-supplier/` + id;
 
       axios
         .put(path)
@@ -366,7 +366,7 @@ export default {
     // GET ALL METERIAL
     getSupplier() {
       axios
-        .get(`http://localhost:9090/rest/v1/supplier/list`)
+        .get(`http://localhost:9090/rest/v1/admin/supplier/list`)
         .then((response) => response.data)
         .then((res) => {
           this.items = res.object.map((supplier) => {
@@ -383,7 +383,7 @@ export default {
     },
     // ADD METERIAL
     addSupplier(payload) {
-      const path = "http://localhost:9090/rest/v1/supplier/add-supplier";
+      const path = "http://localhost:9090/rest/v1/admin/supplier/add-supplier";
       axios
         .post(path, payload)
         .then((res) => {
@@ -413,7 +413,7 @@ export default {
     edit(id) {
       this.isEdit = id;
       axios
-        .get(`http://localhost:9090/rest/v1/supplier/` + id)
+        .get(`http://localhost:9090/rest/v1/admin/supplier/` + id)
         .then((res) => res.data)
         .then((response) => {
           console.log("response", response);
@@ -429,7 +429,7 @@ export default {
     update() {
       axios
         .put(
-          `http://localhost:9090/rest/v1/supplier/edit-supplier`,
+          `http://localhost:9090/rest/v1/admin/supplier/edit-supplier`,
           this.editform,
           {},
           console.log(this.isEdit, "Id Update"),

@@ -98,7 +98,7 @@
                   <b-modal
                     id="my-modal"
                     ref="editSupModal"
-                    title="Thông tin nguyên liệu"
+                    title="Thông tin loại hàng"
                     ok-only
                   >
                     <pre></pre>
@@ -227,13 +227,13 @@ export default {
           label: "#",
         },
         {
-          key: "code",
+          key: "code", label: "Mã loại hàng",
         },
         {
-          key: "name",
+          key: "name", label: "Tên loại hàng",
         },
         {
-          key: "status",
+          key: "status", label: "Trạng thái",
         },
 
         { key: "actions", label: "Hành động" },
@@ -260,7 +260,7 @@ export default {
   methods: {
     ItemDelete(id) {
       const path =
-        `http://localhost:9090/rest/v1/category/remove-category/` + id;
+        `http://localhost:9090/rest/v1/admin/category/remove-category/` + id;
 
       axios
         .put(path)
@@ -308,7 +308,7 @@ export default {
     // GET ALL METERIAL
     getCategory() {
       axios
-        .get(`http://localhost:9090/rest/v1/category/list`)
+        .get(`http://localhost:9090/rest/v1/admin/category/list`)
         .then((response) => response.data)
         .then((res) => {
           this.items = res.object.map((category) => {
@@ -323,7 +323,7 @@ export default {
     },
     // ADD METERIAL
     addCategory(payload) {
-      const path = "http://localhost:9090/rest/v1/category/add-category";
+      const path = "http://localhost:9090/rest/v1/admin/category/add-category";
       axios
         .post(path, payload)
         .then((res) => {
@@ -351,7 +351,7 @@ export default {
     edit(id) {
       this.isEdit = id;
       axios
-        .get(`http://localhost:9090/rest/v1/category/` + id)
+        .get(`http://localhost:9090/rest/v1/admin/category/` + id)
         .then((res) => res.data)
         .then((response) => {
           console.log("response", response);
@@ -365,7 +365,7 @@ export default {
     update() {
       axios
         .put(
-          `http://localhost:9090/rest/v1/category/edit-category`,
+          `http://localhost:9090/rest/v1/admin/category/edit-category`,
           this.editform,
           {},
           console.log(this.isEdit, "Id Update"),

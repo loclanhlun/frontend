@@ -28,11 +28,11 @@
                   id="modal-1"
                   size="xl"
                   hide-footer
-                  title="Thêm loại hàng"
+                  title="Thêm phiếu nhập"
                   ref="ModalAdd"
                 >
                   <div>
-                    <b-form @submit="SubmitimportBill" v-if="show">
+                    <b-form @submit="submitImportBill" v-if="show">
                       <b-row>
                         <b-col>
                           <b-form-group
@@ -43,7 +43,7 @@
                             <b-form-select
                               v-model="form.warehouseCode"
                               :options="warehouseOptions"
-                              value-field="id"
+                              value-field="code"
                               text-field="name"
                             >
                             </b-form-select>
@@ -56,18 +56,19 @@
                             <b-form-select
                               v-model="form.supplierCode"
                               :options="supplierOptions"
-                              value-field="id"
+                              value-field="code"
                               text-field="name"
                             >
                             </b-form-select>
                           </b-form-group>
-                        
-                          <b-button type="submit" variant="success" v-b-modal.my-modal1
-                            >Thêm</b-button
+
+                          <b-button
+                            type="submit"
+                            variant="success"
+                            v-b-modal.my-modal1
+                            >Chọn</b-button
                           >
                         </b-col>
-
-                       
                       </b-row>
                     </b-form>
                   </div>
@@ -109,21 +110,20 @@
                       ></b-pagination>
                     </b-card-footer>
                   </div>
-            <!--    Add modal  1 -->
-                <b-modal  id="my-modal1" size="lg">
-                <b-row>
+                  <!--    Add modal  1 -->
+                  <b-modal id="my-modal1" size="lg">
+                    <b-row>
                       <b-col lg="6">
-     <form action="">
-
-                              <b-form-group
+                        <form @submit="submitAdd">
+                          <b-form-group
                             id="input-group-1"
                             label="Sản phẩm"
                             label-for="input-1"
                           >
                             <b-form-select
-                              v-model="form.commodityCode"
+                              v-model="form1.commodityCode"
                               :options="commodityOptions"
-                              value-field="id"
+                              value-field="code"
                               text-field="name"
                             >
                             </b-form-select>
@@ -136,7 +136,7 @@
                           >
                             <b-form-input
                               id="input-1"
-                              v-model="form.quantity"
+                              v-model="form1.quantity"
                               placeholder="Nhập số lượng"
                               required
                               type="number"
@@ -150,42 +150,79 @@
                             <b-form-input
                               id="input-1"
                               type="number"
-                              v-model="form.price"
+                              v-model="form1.price"
                               placeholder="Nhập đơn giá"
                               required
                             ></b-form-input>
                           </b-form-group>
+                          <b-button type="submit">Thêm mới</b-button>
                         </form>
-                  </b-col>
+                      </b-col>
 
-                     <b-col lg="6">
-                          <div class="table-import">
-                            <b-table
-                              head-variant="dark"
-                              striped
-                              hover
-                              :items="items"
-                            ></b-table>
-                          </div>
-                          <b-button type="submit" variant="success"
-                            >Nhập hàng</b-button
-                          >
-                        </b-col>
-                </b-row>
-                
-                       
-                      
-                </b-modal>
+                      <b-col lg="6">
+                        <div class="table-import">
+                          <b-table
+                            head-variant="dark"
+                            striped
+                            hover
+                            :items="items1"
+                            :fields="importBillFields"
+                          ></b-table>
+                          <!-- <table class="table text-center">
+                      <thead>
+                        <tr>
+                          <th scope="col">Tên Sản Phẩm</th>
+                          <th scope="col">Số Lượng</th>
+                          <th scope="col">Giá</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="product in cart" :key="product.id">
+                          <td>{{ product.food_name }}</td>
+                          <td>
+                            <button
+                              @click="decreaseQ(product)"
+                              class="btn btn-info btn-sm"
+                            >
+                              -
+                            </button>
+                            <input
+                              type="number"
+                              v-model="product.amount"
+                              style="width: 40px"
+                              min="1"
+                            />
+
+                            <button
+                              @click="increaseQ(product)"
+                              class="btn btn-info btn-sm"
+                            >
+                              +
+                            </button>
+                          </td>
+                          <td>{{ product.food_price }}</td>
+                        </tr>
+                      </tbody>
+                    </table> -->
+                        </div>
+                        <b-button @click="onSubmitImportBillDetail()" variant="success"
+                          >Nhập hàng</b-button
+                        >
+                      </b-col>
+                    </b-row>
+                  </b-modal>
                   <!-- Modal  -->
                   <b-modal
                     id="my-modal"
                     ref="editSupModal"
-                    title="Thông tin nguyên liệu"
+                    title="Thông tin chi tiết phiếu nhập"
                     ok-only
                   >
                     <pre></pre>
                     <div>
-                      <h2 style="text-align: center">Sửa Thể Loại</h2>
+                      <h2 style="text-align: center">
+                        Xem thông tin phiếu nhập
+                      </h2>
                       <div>
                         <b-form @submit="update()" v-if="show">
                           <b-form-group
@@ -311,9 +348,11 @@ export default {
       form: {
         warehouseCode: "",
         supplierCode: "",
-        commodityCode : "",
+      },
+      form1: {
+        commodityCode: "",
         quantity: "",
-        price: ""
+        price: "",
       },
       editform: {
         id: "",
@@ -321,7 +360,22 @@ export default {
         code: "",
         status: "",
       },
-
+       show: true,
+      importBillFields: [
+        {
+          key: "commodity",
+          label: "Tên hàng",
+        },
+        {
+          key: "quantity",
+          label: "Số lượng",
+        },
+        {
+          key: "price",
+          label: "Đơn giá",
+        },
+      ],
+      arrObj:[],
       infoModal: {
         id: "info-modal",
         title: "",
@@ -334,21 +388,28 @@ export default {
           label: "#",
         },
         {
-          key: "fullName", label: "Người nhập"
+          key: "fullName",
+          label: "Người nhập",
         },
         {
-          key: "supplierName", label: "Nhà cung cấp"
+          key: "supplierName",
+          label: "Nhà cung cấp",
         },
         {
-          key: "warehouseName", label: "Tên kho"
+          key: "warehouseName",
+          label: "Tên kho",
         },
 
         { key: "actions", label: "Hành động" },
       ],
+
+     
       // searchit_form: {
       //   material_name: "",
       // },
       items: [],
+
+      items1: [],
 
       selectedCategory: null,
       warehouseOptions: [],
@@ -373,46 +434,9 @@ export default {
   },
 
   methods: {
-      
-      AddimportBill(payload){
-            const path = "http://localhost:9090/rest/v1/import-bill/add-import-bill";
-      axios
-        .post(path, payload)
-        .then((res) => {
-          this.getCategory();
-        })
-        .catch((error) => {
-          this.getCategory();
-          console.log(error);
-        });
-      },
-      SubmitimportBill(){
-
-      },
-      
-    ItemDelete(id) {
-      const path =
-        `http://localhost:9090/rest/v1/category/remove-category/` + id;
-
-      axios
-        .put(path)
-        .then((res) => {
-          console.log(res);
-          this.getCategory();
-
-          // this.$toaster.success("Đã xóa nguyên liệu thành công");
-
-          // this.message = 'Book removed!';
-          // this.showMessage = true;
-        })
-        .catch((error) => {
-          // eslint-disable-next-line
-        });
-    },
-
     getCommodity() {
       axios
-        .get(`http://localhost:9090/rest/v1/commodity/list`)
+        .get(`http://localhost:9090/rest/v1/admin/commodity/list`)
         .then((response) => response.data)
         .then((res) => {
           this.commodityOptions = res.object;
@@ -421,7 +445,7 @@ export default {
 
     getSupplier() {
       axios
-        .get(`http://localhost:9090/rest/v1/supplier/list`)
+        .get(`http://localhost:9090/rest/v1/admin/supplier/list`)
         .then((response) => response.data)
         .then((res) => {
           this.supplierOptions = res.object;
@@ -430,7 +454,7 @@ export default {
 
     getWarehouse() {
       axios
-        .get(`http://localhost:9090/rest/v1/warehouse/list`)
+        .get(`http://localhost:9090/rest/v1/admin/warehouse/list`)
         .then((response) => response.data)
         .then((res) => {
           this.warehouseOptions = res.object;
@@ -480,32 +504,108 @@ export default {
           });
         });
     },
-    // ADD METERIAL
-    addCategory(payload) {
+    AddImportBill(payload) {
       const path = "http://localhost:9090/rest/v1/import-bill/add-import-bill";
       axios
         .post(path, payload)
         .then((res) => {
-          this.getCategory();
+          this.getImportBill();
         })
         .catch((error) => {
-          this.getCategory();
+          this.getImportBill();
           console.log(error);
         });
     },
 
-    onSubmit(event) {
+    submitImportBill(event) {
       event.preventDefault();
       this.$refs.ModalAdd.hide();
       const payload = {
-        code: this.form.code,
-        name: this.form.name,
+        warehouseCode: this.form.warehouseCode,
+        supplierCode: this.form.supplierCode,
       };
 
-      this.addCategory(payload);
-      this.onReset();
       this.$refs["ModalAdd"].hide();
+      this.AddImportBill(payload);
+      this.onReset();
+     
     },
+
+    AddImportBillDetail(payload){
+      const path =
+        "http://localhost:9090/rest/v1/import-bill-detail/add-import-bill-detail";
+      axios
+        .post(path, payload)
+        .then((res) => {
+          this.getImportBill();
+        })
+        .catch((error) => {
+          this.getImportBill();
+          console.log(error);
+        });
+    },
+    onSubmitImportBillDetail(){
+      event.preventDefault();
+      this.$refs.ModalAdd.hide();
+      this.AddImportBillDetail( this.arrObj)
+       this.$refs["ModalAdd"].hide();
+      this.AddImportBill(payload);
+      this.onReset();
+    },
+
+    addArrayImportBillDetail(payload) {
+      payload.commodity = this.commodityOptions.find(i => i.code == payload.commodityCode).name;
+      const availabeCommodity = this.items1.find(i => i.commodityCode == payload.commodityCode);
+      var obj = JSON.parse('{"data" :[]}');
+      if(availabeCommodity){
+          availabeCommodity.quantity = parseInt(availabeCommodity.quantity) + parseInt(payload.quantity);
+          availabeCommodity.price = payload.price;
+          console.log(this.items1);
+          obj.data = JSON.parse(JSON.stringify(this.items1));
+      }else{
+          this.items1 = [...this.items1, payload];
+          obj.data = JSON.parse(JSON.stringify(this.items1));
+      }
+      this.arrObj = obj;
+      console.log(this.arrObj , " arr Data");
+      console.log(obj , "arrdefaut");
+      
+      // spread operator ES6
+     
+    },
+    submitAdd() {
+      const payload = {
+        commodityCode: this.form1.commodityCode,
+        quantity: this.form1.quantity,
+        price: this.form1.price,
+      };
+      this.addArrayImportBillDetail(payload);
+    },
+    // ADD Import Bill
+    // addImportBill(payload) {
+    //   const path = "http://localhost:9090/rest/v1/import-bill/add-import-bill";
+    //   axios
+    //     .post(path, payload)
+    //     .then((res) => {
+    //       this.getImportBill();
+    //     })
+    //     .catch((error) => {
+    //       this.getImportBill();
+    //       console.log(error);
+    //     });
+    // },
+
+    // onSubmit(event) {
+    //   event.preventDefault();
+    //   this.$refs.ModalAdd.hide();
+    //   const payload = {
+    //     code: this.form.warehouseCode,
+    //     name: this.form.supplierCode,
+    //   };
+    //   this.$refs["ModalAdd"].hide();
+    //   this.addImportBill(payload);
+    //   this.onReset();
+    // },
     // // EDIT METERIAL
     edit(id) {
       this.isEdit = id;
@@ -521,29 +621,12 @@ export default {
           console.log(this.editform.id);
         });
     },
-    update() {
-      axios
-        .put(
-          `http://localhost:9090/rest/v1/category/edit-category`,
-          this.editform,
-          {},
-          console.log(this.isEdit, "Id Update"),
-          console.log(this.editform, "Form")
-        )
-        .then((res) => {
-          console.log(res);
-          this.getCategory();
-        })
-        .catch((err) => {
-          this.$refs.editSupModal.hide();
-        });
-    },
+    
 
     onReset() {
       // Reset our form values
-      this.form.name = "";
-      this.form.code = "";
-      this.form.categoryid = "";
+      this.form.warehouseCode = "";
+      this.form.supplierCode = "";
     },
     info(item, index, button) {
       this.infoModal.title = `Row index: ${index}`;

@@ -318,7 +318,7 @@ export default {
   methods: {
     ItemDelete(id) {
       const path =
-        `http://localhost:9090/rest/v1/agency/remove-agency/` + id;
+        `http://localhost:9090/rest/v1/admin/agency/remove-agency/` + id;
 
       axios
         .put(path)
@@ -366,7 +366,7 @@ export default {
     // GET ALL METERIAL
     getAgency() {
       axios
-        .get(`http://localhost:9090/rest/v1/agency/list`)
+        .get(`http://localhost:9090/rest/v1/admin/agency/list`)
         .then((response) => response.data)
         .then((res) => {
           this.items = res.object.map((agency) => {
@@ -383,7 +383,7 @@ export default {
     },
     // ADD METERIAL
     addAgency(payload) {
-      const path = "http://localhost:9090/rest/v1/agency/add-agency";
+      const path = "http://localhost:9090/rest/v1/admin/agency/add-agency";
       axios
         .post(path, payload)
         .then((res) => {
@@ -413,7 +413,7 @@ export default {
     edit(id) {
       this.isEdit = id;
       axios
-        .get(`http://localhost:9090/rest/v1/agency/` + id)
+        .get(`http://localhost:9090/rest/v1/admin/agency/` + id)
         .then((res) => res.data)
         .then((response) => {
           console.log("response", response);
