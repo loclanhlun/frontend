@@ -111,7 +111,7 @@
                     </b-card-footer>
                   </div>
                   <!--    Add modal  1 -->
-                  <b-modal id="my-modal1" size="lg">
+                  <b-modal id="my-modal1" ref="AddImportBillDetailModel" size="lg">
                     <b-row>
                       <b-col lg="6">
                         <form @submit="submitAdd">
@@ -168,42 +168,6 @@
                             :items="items1"
                             :fields="importBillFields"
                           ></b-table>
-                          <!-- <table class="table text-center">
-                      <thead>
-                        <tr>
-                          <th scope="col">Tên Sản Phẩm</th>
-                          <th scope="col">Số Lượng</th>
-                          <th scope="col">Giá</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr v-for="product in cart" :key="product.id">
-                          <td>{{ product.food_name }}</td>
-                          <td>
-                            <button
-                              @click="decreaseQ(product)"
-                              class="btn btn-info btn-sm"
-                            >
-                              -
-                            </button>
-                            <input
-                              type="number"
-                              v-model="product.amount"
-                              style="width: 40px"
-                              min="1"
-                            />
-
-                            <button
-                              @click="increaseQ(product)"
-                              class="btn btn-info btn-sm"
-                            >
-                              +
-                            </button>
-                          </td>
-                          <td>{{ product.food_price }}</td>
-                        </tr>
-                      </tbody>
-                    </table> -->
                         </div>
                         <b-button @click="onSubmitImportBillDetail()" variant="success"
                           >Nhập hàng</b-button
@@ -517,8 +481,7 @@ export default {
         });
     },
 
-    submitImportBill(event) {
-      event.preventDefault();
+    submitImportBill() {
       this.$refs.ModalAdd.hide();
       const payload = {
         warehouseCode: this.form.warehouseCode,
@@ -545,10 +508,9 @@ export default {
         });
     },
     onSubmitImportBillDetail(){
-      event.preventDefault();
-      this.$refs.ModalAdd.hide();
+      this.$refs.AddImportBillDetailModel.hide();
       this.AddImportBillDetail( this.arrObj)
-       this.$refs["ModalAdd"].hide();
+       this.$refs["AddImportBillDetailModel"].hide();
       this.AddImportBill(payload);
       this.onReset();
     },
