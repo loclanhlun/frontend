@@ -7,23 +7,45 @@
             <div class="items-click-add">
               <h3>Danh sách loại hàng</h3>
               <div>
-                <div class="pseudo-search">
-                  <!--   @keyup="onSeach()"
-                    v-model="searchit_form.material_name" -->
-                  <input
-                    type="text"
-                    placeholder="Tìm kiếm..."
-                    autofocus
-                    required
-                  />
-                  <button class="fa fa-search" type="submit"></button>
-                </div>
+              <b-button v-b-modal.modal-2 variant="success">
+                  <i class="fas fa-filter"/></b-button>
+                <b-modal id="modal-2" hide-footer ref="Model_filter">
+                  <b-form @submit="onSearch" v-if="show">
+                    <b-form-group id="input-group-1" label="Tên đại lý.">
+                      <b-form-input
+                        placeholder="Nhập tên đại lý"
+                        v-model="search.name"
+                        type="text"
+                      ></b-form-input>
 
+                      <div style="margin-top: 20px">
+                        <b-form-group
+                          id="input-group-1"
+                          label="Trạng thái"
+                          label-for="input-1"
+                        >
+                          <b-form-select
+                            
+                            v-model="search.status"
+                            :options="options1"
+                          >
+                          </b-form-select>
+                        </b-form-group>
+                      </div>
+                    </b-form-group>
+                    <b-button type="submit" variant="success">Lọc</b-button>
+                  </b-form>
+                </b-modal>
                 <b-button v-b-modal.modal-1 variant="success"
                   >Thêm mới</b-button
                 >
 
-                <b-modal id="modal-1" title="Thêm loại hàng" ref="ModalAdd">
+                <b-modal
+                  id="modal-1"
+                  title="Thêm loại hàng"
+                  ref="ModalAdd"
+                  hide-footer
+                >
                   <div>
                     <b-form @submit="onSubmit" v-if="show">
                       <b-form-group
@@ -50,10 +72,17 @@
                           required
                         ></b-form-input>
                       </b-form-group>
-                      <b-button type="submit" variant="success"
-                        >Xác Nhận</b-button
-                      >
-                      <b-button type="reset" variant="light">Đóng</b-button>
+                      <div class="d-flex justify-content-end">
+                        <b-button class="m-1" type="submit" variant="success"
+                          >Xác Nhận</b-button
+                        >
+                        <b-button
+                          class="m-1"
+                          @click="$bvModal.hide('modal-1')"
+                          variant="light"
+                          >Đóng</b-button
+                        >
+                      </div>
                     </b-form>
                   </div>
                 </b-modal>
@@ -75,12 +104,30 @@
                       :fields="fields"
                     >
                       <template #cell(actions)="row">
-                        <b-button v-b-modal.my-modal @click="edit(row.item.id)">
-                          Sửa
+                        <b-button
+                          class="m-1"
+                          variant="danger"
+                          v-b-modal.my-modal
+                          @click="edit(row.item.id)"
+                        >
+                          <i class="fas fa-edit"></i>
                         </b-button>
-                        <b-button @click="ItemDelete(row.item.id)">
-                          Xóa
+                        <b-button
+                          class="m-1"
+                          variant="warning"
+                          @click="ItemDelete(row.item.id)"
+                        >
+                          <i class="far fa-trash-alt"></i>
                         </b-button>
+                      </template>
+
+                      <template v-slot:cell(status)="row">
+                        <b-badge v-if="row.item.status" variant="warning"
+                          >Ngừng kinh doanh</b-badge
+                        >
+                        <b-badge v-else variant="success"
+                          >Đang kinh doanh</b-badge
+                        >
                       </template>
                     </b-table>
                     <b-card-footer class="py-4 d-flex justify-content-start">
@@ -99,7 +146,7 @@
                     id="my-modal"
                     ref="editSupModal"
                     title="Thông tin loại hàng"
-                    ok-only
+                    hide-footer
                   >
                     <pre></pre>
                     <div>
@@ -145,11 +192,18 @@
                           <!-- Show Modal Nguyên Liệu -->
 
                           <!-- Button Click Submit -->
-                          <div class="link-btn">
-                            <b-button type="submit" variant="success"
+
+                          <div class="d-flex justify-content-end">
+                            <b-button
+                              class="m-1"
+                              type="submit"
+                              variant="success"
                               >Xác Nhận</b-button
                             >
-                            <b-button type="reset" variant="light"
+                            <b-button
+                              class="m-1"
+                              @click="$bvModal.hide('my-modal')"
+                              variant="light"
                               >Đóng</b-button
                             >
                           </div>
@@ -169,6 +223,7 @@
 </template>
 <script>
 import axios from "axios";
+import Toasted from "vue-toasted";
 import {
   Dropdown,
   DropdownItem,
@@ -187,13 +242,20 @@ export default {
   },
   data() {
     return {
+      dialog: false,
+
+      search: {
+        name: "",
+        status: null,
+      },
+
       meterialdetail: {
         meterial: "",
       },
 
       selected: null,
       options1: [
-        { value: null, text: "Please select an option" },
+        { value: null, text: "Please select an option"},
         { value: 0, text: "Còn giao dịch" },
         { value: 1, text: "Ngừng giao dịch" },
       ],
@@ -212,7 +274,7 @@ export default {
         id: "",
         name: "",
         code: "",
-        status: "",
+        status: null,
       },
 
       infoModal: {
@@ -227,13 +289,16 @@ export default {
           label: "#",
         },
         {
-          key: "code", label: "Mã loại hàng",
+          key: "code",
+          label: "Mã loại hàng",
         },
         {
-          key: "name", label: "Tên loại hàng",
+          key: "name",
+          label: "Tên loại hàng",
         },
         {
-          key: "status", label: "Trạng thái",
+          key: "status",
+          label: "Trạng thái",
         },
 
         { key: "actions", label: "Hành động" },
@@ -261,64 +326,73 @@ export default {
     ItemDelete(id) {
       const path =
         `http://localhost:9090/rest/v1/admin/category/remove-category/` + id;
-
-      axios
-        .put(path)
-        .then((res) => {
-          console.log(res);
-          this.getCategory();
-
-          // this.$toaster.success("Đã xóa nguyên liệu thành công");
-
-          // this.message = 'Book removed!';
-          // this.showMessage = true;
-        })
-        .catch((error) => {
-          // eslint-disable-next-line
-        });
+      if (confirm("Bạn có chắc chắn muốn xóa?")) {
+        axios
+          .put(path)
+          .then((response) => response.data)
+          .then((res) => {
+            if (res.resultCode == "999") {
+              this.$toaster.error(res.message);
+            } else if (res.resultCode == "0") {
+              this.$toaster.success("Thành công!");
+            }
+            this.getCategory();
+          })
+          .catch((error) => {});
+      }
     },
 
-    //SEARCH METERIAL
-    // searchItem(payload) {
-    //   const path = "http://127.0.0.1:8000/material/search_material/";
-    //   axios
-    //     .post(path, payload)
-    //     .then((res) => {
-    //       this.items = res.data.data.map((material) => {
-    //         return {
-    //           mã_nguyên_liệu: material.id,
-    //           tên_nguyên_liệu: material.material_name,
-    //         };
-    //       });
-    //     })
-
-    //     .catch((error) => {
-    //       // this.getSuplier();
-    //       console.log(error);
-    //     });
-    // },
-
-    // onSeach() {
-    //   const payload = {
-    //     material_name: this.searchit_form.material_name,
-    //   };
-
-    //   this.searchItem(payload);
-    // },
+    searchCategory(payload) {
+      const path = "http://localhost:9090/rest/v1/admin/category/search";
+      axios
+        .post(path, payload)
+        .then((res) => {
+          this.items = res.data.object.map((category) => {
+            return {
+              id: category.id,
+                code: category.code,
+                name: category.name,
+                status: category.status,
+            };
+          });
+        })
+        .catch((error) => {
+          
+          console.log(error);
+        });
+    },
+    onSearch() {
+      const payload = {
+        name: this.search.name,
+        status: this.search.status,
+      };
+      console.log(payload);
+      this.searchCategory(payload);
+      this.$refs["Model_filter"].hide();
+    },
     // GET ALL METERIAL
     getCategory() {
       axios
         .get(`http://localhost:9090/rest/v1/admin/category/list`)
         .then((response) => response.data)
         .then((res) => {
-          this.items = res.object.map((category) => {
-            return {
-              id: category.id,
-              code: category.code,
-              name: category.name,
-              status: category.status,
-            };
-          });
+          if (res.resultCode == "401") {
+            this.$toaster.error("Vui lòng đăng nhập trước khi vào trang này!");
+          } else {
+            this.items = res.object.map((category) => {
+              return {
+                id: category.id,
+                code: category.code,
+                name: category.name,
+                status: category.status,
+              };
+            });
+          }
+        })
+        .catch((error) => {
+          // this.getCommodity();
+          console.error();
+          this.$toaster.error("Bạn không có quyền truy cập vào trang này!");
         });
     },
     // ADD METERIAL
@@ -326,7 +400,13 @@ export default {
       const path = "http://localhost:9090/rest/v1/admin/category/add-category";
       axios
         .post(path, payload)
+        .then((response) => response.data)
         .then((res) => {
+          if (res.resultCode == "999") {
+            this.$toaster.error(res.message);
+          } else if (res.resultCode == "0") {
+            this.$toaster.success("Thành công!");
+          }
           this.getCategory();
         })
         .catch((error) => {
@@ -367,12 +447,16 @@ export default {
         .put(
           `http://localhost:9090/rest/v1/admin/category/edit-category`,
           this.editform,
-          {},
-          console.log(this.isEdit, "Id Update"),
-          console.log(this.editform, "Form")
+          {}
         )
+        .then((response) => response.data)
         .then((res) => {
-          console.log(res);
+          if (res.resultCode == "999") {
+            this.$toaster.error(res.message);
+          } else if (res.resultCode == "0") {
+            this.$toaster.success("Thành công!");
+          }
+          this.$refs.editSupModal.hide();
           this.getCategory();
         })
         .catch((err) => {

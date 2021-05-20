@@ -5,7 +5,7 @@
         <b-col lg="12">
           <card>
             <div class="items-click-add">
-              <h3>Danh sách phiếu nhập</h3>
+              <h3>Danh sách phiếu xuất</h3>
               <div>
                 <div class="pseudo-search">
                   <!--   @keyup="onSeach()"
@@ -16,9 +16,9 @@
                     autofocus
                     required
                   />
-                  <button  class="fa fa-search" type="submit"></button>
+                  <button class="fa fa-search" type="submit"></button>
                 </div>
-                <b-button v-b-modal.modal-2 variant="success"> <i class="fas fa-filter"/></b-button>
+                <b-button class="m-1" v-b-modal.modal-2 variant="success"> <i class="fas fa-filter"/></b-button>
                 <b-modal id="modal-2" hide-footer ref="Model_filter">
                   <b-form @submit="onFilter" v-if="show">
                     <b-form-group id="input-group-1" label="Thời gian.">
@@ -55,20 +55,20 @@
                   </b-form>
                 </b-modal>
 
-                <b-button class="m-1" v-b-modal.modal-1 variant="success"
+                <b-button v-b-modal.modal-1 variant="success"
                   >Thêm mới</b-button
                 >
 
                 <b-modal
                   class="model-import"
                   id="modal-1"
-               
+             
                   hide-footer
-                  title="Thêm phiếu nhập"
+                  title="Thêm phiếu xuất"
                   ref="ModalAdd"
                 >
                   <div>
-                    <b-form @submit="submitImportBill" v-if="show">
+                    <b-form @submit="submitExportBill" v-if="show">
                       <b-row>
                         <b-col>
                           <b-form-group
@@ -79,6 +79,7 @@
                             <b-form-select
                               v-model="form.warehouseCode"
                               :options="warehouseOptions"
+                              @change="onSeach()"
                               value-field="code"
                               text-field="name"
                               required
@@ -87,12 +88,12 @@
                           </b-form-group>
                           <b-form-group
                             id="input-group-1"
-                            label="Nhà cung cấp"
+                            label="Đại lý"
                             label-for="input-1"
                           >
                             <b-form-select
-                              v-model="form.supplierCode"
-                              :options="supplierOptions"
+                              v-model="form.agencyCode"
+                              :options="agencyOptions"
                               value-field="code"
                               text-field="name"
                               required
@@ -112,6 +113,7 @@
                       </b-row>
                     </b-form>
                   </div>
+                  
                 </b-modal>
               </div>
             </div>
@@ -131,14 +133,8 @@
                       :fields="fields"
                     >
                       <template #cell(actions)="row">
-                        <b-button variant="danger"
-                          v-b-modal.my-modal
-                          @click="
-                            getImportBillDetailByImportBillId(row.item.id)
-                          "
-                        >
-                        <i class="fas fa-eye"></i>
-                          Xem
+                        <b-button variant="danger" v-b-modal.my-modal @click="getExportBillDetailByExportBillId(row.item.id)">
+                         <i class="fas fa-eye"></i> Xem
                         </b-button>
                       </template>
                     </b-table>
@@ -153,36 +149,13 @@
                     </b-card-footer>
                   </div>
                   <!--    Add modal  1 -->
-                  <b-modal
-                    id="my-modal1"
-                    ref="AddImportBillDetailModel"
-                    hide-footer
-                    size="lg"
-                    no-close-on-backdrop="false"
-                    hide-header-close
-                  >
+                  <b-modal id="my-modal1" ref="AddExportBillDetailModel" 
+                  size="lg"
+                  hide-footer
+                  no-close-on-backdrop="false">
                     <b-row>
-                      <b-col lg="3">
+                      <b-col lg="6">
                         <form @submit="submitAdd">
-                          <b-form-group
-                            id="input-group-1"
-                            label="Loại sản phẩm"
-                            label-for="input-1"
-                          >
-                            <select
-                              class="custom-select"
-                              v-model="searchit_form.categoryId"
-                              @change="onSeach()"
-                            >
-                              <option
-                                v-for="categoryOption in categoryOptions"
-                                :key="categoryOption.id"
-                                :value="categoryOption.id"
-                              >
-                                {{ categoryOption.name }}
-                              </option>
-                            </select>
-                          </b-form-group>
                           <b-form-group
                             id="input-group-1"
                             label="Sản phẩm"
@@ -191,8 +164,8 @@
                             <b-form-select
                               v-model="form1.commodityCode"
                               :options="commodityOptions"
-                              value-field="code"
-                              text-field="name"
+                              value-field="commodityCode"
+                              text-field="commodityName"
                               required
                             >
                             </b-form-select>
@@ -202,6 +175,7 @@
                             label="số lượng"
                             label-for="input-1"
                             type="number"
+                            
                           >
                             <b-form-input
                               id="input-1"
@@ -209,6 +183,7 @@
                               placeholder="Nhập số lượng"
                               required
                               type="number"
+                              
                             ></b-form-input>
                           </b-form-group>
                           <b-form-group
@@ -224,38 +199,25 @@
                               required
                             ></b-form-input>
                           </b-form-group>
-                          <b-button type="submit">Thêm mới</b-button>
+                          <b-button type="submit">Thêm vào danh sách</b-button>
                         </form>
                       </b-col>
 
-                      <b-col lg="9">
-                        <div class="content-table">
+                      <b-col lg="6">
+                        <div class="table-import">
                           <b-table
-                            class="table-sc"
-                            id="my-table"
                             head-variant="dark"
+                            striped
                             hover
                             :items="items1"
-                            :fields="importBillFields"
-                          >
-                          <template #cell(actions)="row">
-                            <b-button
-                          class="m-1"
-                          variant="danger"
-                          
-                          @click="deleteItem(row.index)"
-                        >
-                          <i class="far fa-trash-alt"></i>
-                        </b-button>
-                            </template>
-                          </b-table>
+                            :fields="exportBillFields"
+                          ></b-table>
                         </div>
-                        <b-button
-                          @click="onSubmitImportBillDetail()"
-                          variant="success"
-                          >Nhập hàng</b-button
+                        <b-button @click="onSubmitExportBillDetail()" variant="success"
+                          >Xuất hàng</b-button
                         >
-                        <b-button @click="deleteImportBill()" variant="success"
+
+                        <b-button @click="deleteExportBill()" variant="warning"
                           >Hủy</b-button
                         >
                       </b-col>
@@ -265,9 +227,7 @@
                   <b-modal
                     id="my-modal"
                     ref="editSupModal"
-                    title="Thông tin chi tiết phiếu nhập"
                     ok-only
-                    
                   >
                     <pre></pre>
                     <div>
@@ -275,26 +235,17 @@
                         Xem thông tin phiếu nhập
                       </h2>
                       <div>
-                      <!--  <b-form v-if="show"> -->
-                          
-                            <!-- <b-table 
-                              tbody-class="rowClass"
-                              head-variant="dark"
-                              striped
-                              hover
-                              :items="Items11"
-                              :fields="importBillFields"
-                            ></b-table> -->
-                            <b-table 
-                            
-                             head-variant="dark"
+                        <b-form v-if="show">
+                          <div class="table-import">
+                          <b-table
+                            head-variant="dark"
+                            striped
+                            hover
                             :items="Items11"
-                            :fields="importBillFields"
-                            >
-                            
-                            </b-table>
-                          
-                        <!-- </b-form> -->
+                            :fields="exportBillFields"
+                          ></b-table>
+                        </div>  
+                        </b-form>
                       </div>
                     </div>
                   </b-modal>
@@ -311,7 +262,7 @@
 <script>
 import axios from "axios";
 import moment from "moment";
-import Toasted from "vue-toasted";
+import Toasted from 'vue-toasted';
 import {
   Dropdown,
   DropdownItem,
@@ -335,6 +286,10 @@ export default {
         toDate: "",
         warehouseCode: "",
       },
+      meterialdetail: {
+        meterial: "",
+      },
+      
       isEdit: null,
       // projects,
       // users,
@@ -344,28 +299,21 @@ export default {
 
       form: {
         warehouseCode: "",
-        supplierCode: "",
+        agencyCode: "",
       },
       form1: {
-        id : "",
-        categoryId: "",
         commodityCode: "",
         quantity: "",
         price: "",
       },
-      // editform: {
-      //   id: "",
-      //   commodityName : "",
-      //   importBill: "",
-      //   quantity: "",
-      //   price: "",
-      // },
-      show: true,
-      importBillFields: [
-        {
-          key: "id",
-          label: "#",
-        },
+      editform: {
+        id: "",
+        name: "",
+        code: "",
+        status: "",
+      },
+       show: true,
+      exportBillFields: [
         {
           key: "commodity",
           label: "Tên hàng",
@@ -378,15 +326,8 @@ export default {
           key: "price",
           label: "Đơn giá",
         },
-        { key: "actions", label: "Hành động" },
-
-        
       ],
-      arrObj: [],
-
-      index:{
-        index : ""
-      },
+      arrObj:[],
       infoModal: {
         id: "info-modal",
         title: "",
@@ -400,31 +341,32 @@ export default {
         },
         {
           key: "fullName",
-          label: "Người nhập",
+          label: "Người xuất",
         },
         {
-          key: "supplierName",
-          label: "Nhà cung cấp",
+          key: "agencyName",
+          label: "Tên Đại lý",
         },
         {
           key: "warehouseName",
           label: "Tên kho",
         },
         {
-          key: "importDate",
-          label: "Ngày nhập",
+          key: "exportDate",
+          label: "Ngày xuất",
         },
         {
           key: "totalPrice",
-          label: "Tổng giá trị"
+          label: "Tổng giá trị",
         },
 
         { key: "actions", label: "Hành động" },
       ],
 
-      searchit_form: {
-        categoryId: "",
-      },
+     
+      // searchit_form: {
+      //   material_name: "",
+      // },
       items: [],
 
       items1: [],
@@ -434,11 +376,8 @@ export default {
       selectedCategory: null,
       warehouseOptions: [],
 
-      selectedCategory: null,
-      categoryOptions: [],
-
       selectedSupplier: null,
-      supplierOptions: [],
+      agencyOptions: [],
 
       selectedCommodity: null,
       commodityOptions: [],
@@ -448,59 +387,22 @@ export default {
   },
   created() {
     this.getWarehouse();
-    this.getSupplier();
-    // this.getCommodity();
-    this.getImportBill();
-    this.getCategory();
+    this.getAgency();
+    this.getExportBill();
     // setInterval(() => {
     //   this.onSeach();
     // }, 500);
   },
 
   methods: {
-    // getCommodity() {
-    //   axios
-    //     .get(`http://localhost:9090/rest/v1/admin/commodity/list`)
-    //     .then((response) => response.data)
-    //     .then((res) => {
-    //       this.commodityOptions = res.object;
-    //     });
-    // },
-
-    deleteImportBill() {
-      const path = `http://localhost:9090/rest/v1/import-bill/delete-import-bill`;
-      if (confirm("Tất cả hàng hóa sẽ không được nhập vào kho, bạn có chắc chắn muốn hủy?")) {
-        axios
-          .delete(path)
-          .then((res) => {
-            this.getImportBill();
-            this.$refs["AddImportBillDetailModel"].hide();
-          })
-          .catch((error) => {
-            // eslint-disable-next-line
-          });
-      }else{
-        
-      }
-    },
 
 
-    getCategory() {
+    getAgency() {
       axios
-        .get(`http://localhost:9090/rest/v1/admin/category/list`)
+        .get(`http://localhost:9090/rest/v1/admin/agency/list`)
         .then((response) => response.data)
         .then((res) => {
-          this.categoryOptions = res.object;
-          console.log(this.categoryOptions, "Data Options");
-        });
-    },
-
-    getSupplier() {
-      axios
-        .get(`http://localhost:9090/rest/v1/admin/supplier/list`)
-        .then((response) => response.data)
-        .then((res) => {
-          this.supplierOptions = res.object;
+          this.agencyOptions = res.object;
         });
     },
 
@@ -512,20 +414,103 @@ export default {
           this.warehouseOptions = res.object;
         });
     },
+
+    deleteExportBill() {
+      const path =
+        `http://localhost:9090/rest/v1/export-bill/delete-export-bill`;
+      if(confirm("Tất cả hàng hóa sẽ không được nhập vào kho, bạn có chắc chắn muốn hủy?")){
+          axios
+        .delete(path)
+        .then((res) => {
+          this.getExportBill();
+          this.$refs["AddExportBillDetailModel"].hide();
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+        });
+      }else{
+
+      }
+      
+    },
+
+    getExportBillDetailByExportBillId(id) {
+     
+      axios
+        .get(`http://localhost:9090/rest/v1/export-bill-detail/list/` + id)
+        .then((response) => response.data)
+        .then((res) => {
+          this.Items11 = res.object.map((exportBillDetail) => {
+            return {
+              id: exportBillDetail.id,
+              commodity: exportBillDetail.commodityName,
+              quantity: exportBillDetail.quantity,
+              price: exportBillDetail.price,
+            };
+          }); 
+        });
+    },
+
+    
+    
+    // GET ALL METERIAL
+    getExportBill() {
+      axios
+        .get(`http://localhost:9090/rest/v1/export-bill/list`)
+        .then((response) => response.data)
+        .then((res) => {
+          this.items = res.object.map((exportBill) => {
+            return {
+              id: exportBill.id,
+              fullName: exportBill.fullName,
+              agencyName: exportBill.agencyName,
+              warehouseName: exportBill.warehouseName,
+              exportDate: exportBill.exportDate,
+              
+              totalPrice: exportBill.totalPrice.toLocaleString() + " VNĐ",
+              
+              
+            };
+          });
+        });
+    },
+
+  
+
+    AddExportBill(payload) {
+      const path = "http://localhost:9090/rest/v1/export-bill/add-export-bill";
+      axios
+        .post(path, payload)
+    },
+
+    submitExportBill(event) {
+      event.preventDefault();
+      this.$refs.ModalAdd.hide();
+      const payload = {
+        warehouseCode: this.form.warehouseCode,
+        agencyCode: this.form.agencyCode,
+      };
+
+      this.$refs["ModalAdd"].hide();
+       this.$refs["AddExportBillDetailModel"].show();
+      this.AddExportBill(payload);
+      this.onReset();
+     
+    },
     searchIte11(payload) {
-      const path = "http://localhost:9090/rest/v1/import-bill/search";
+      const path = "http://localhost:9090/rest/v1/export-bill/search";
       axios
         .post(path, payload)
         .then((res) => {
           console.log(res, "resss");
 
-          this.items = res.data.object.map((importBill) => {
+          this.items = res.data.object.map((exportBill) => {
             return {
-              id: importBill.id,
-              fullName: importBill.fullName,
-              supplierName: importBill.supplierName,
-              warehouseName: importBill.warehouseName,
-              importDate: importBill.importDate,
+              id: exportBill.id,
+              fullName: exportBill.fullName,
+              agencyName: exportBill.agencyName,
+              warehouseName: exportBill.warehouseName,
+              exportDate: exportBill.exportDate,
             };
 
             // return {
@@ -556,149 +541,80 @@ export default {
       this.onReset();
     },
 
-    onResetArray(){
-      // console.log(this.items1.length, "length items1");
-      this.items1 = [];
-      this.searchit_form.categoryId = ""
-      this.form1.commodityCode = ""
-      this.form1.quantity = ""
-      this.form1.price = ""
-    },
-    //SEARCH METERIAL
     searchItem(payload) {
-      const path =
-        "http://localhost:9090/rest/v1/admin/commodity/list-commodity";
+      const path = "http://localhost:9090/rest/v1/commodity-warehouse/search-commodity-warehouse";
       axios
         .post(path, payload)
         .then((res) => {
           console.log(res);
-          this.commodityOptions = res.data.object;
+          console.log(res, "DATA");
+          this.commodityOptions = res.data.object
 
-          console.log(this.commodityOptions, "đasadads");
+          
         })
         .catch((error) => {
           // this.getSuplier();
           console.log(error);
         });
     },
+    
 
     onSeach() {
       const payload = {
-        id: this.searchit_form.categoryId,
+        code: this.form.warehouseCode,
+        
       };
       this.searchItem(payload);
+      console.log(payload);
     },
 
-    //   this.searchItem(payload);
-    // },
-    // GET ALL METERIAL
-    getImportBill() {
-      axios
-        .get(`http://localhost:9090/rest/v1/import-bill/list`, {params: { answer: this.searchit_form.categoryId }})
-        .then((response) => response.data)
-        .then((res) => {
-          this.items = res.object.map((importBill) => {
-            return {
-              id: importBill.id,
-              fullName: importBill.fullName,
-              supplierName: importBill.supplierName,
-              warehouseName: importBill.warehouseName,
-              importDate: importBill.importDate,
-              totalPrice: importBill.totalPrice.toLocaleString() + " VNĐ",
-            };
-          });
-        });
-    },
-
-    getImportBillDetailByImportBillId(id) {
-      // this.isEdit = id;
-      axios
-        .get(`http://localhost:9090/rest/v1/import-bill-detail/list/` + id)
-        .then((response) => response.data)
-        .then((res) => {
-          console.log(res, "đấ");
-          this.Items11 = res.object.map((importBillDetail) => {
-            return {
-              id: importBillDetail.id,
-              commodity: importBillDetail.commodityName,
-              quantity: importBillDetail.quantity,
-              price: importBillDetail.price,
-            };
-          });
-        });
-    },
-    AddImportBill(payload) {
-      const path = "http://localhost:9090/rest/v1/import-bill/add-import-bill";
-      axios
-        .post(path, payload)
-    },
-
-    submitImportBill(event) {
-       event.preventDefault();
-      const payload = {
-        warehouseCode: this.form.warehouseCode,
-        supplierCode: this.form.supplierCode,
-      };
-
-      this.$refs["ModalAdd"].hide();
-      this.$refs["AddImportBillDetailModel"].show();
-     
-      this.AddImportBill(payload);
-      this.onReset();
-    },
-
-    AddImportBillDetail(payload) {
+    AddExportBillDetail(payload){
       const path =
-        "http://localhost:9090/rest/v1/import-bill-detail/add-import-bill-detail";
+        "http://localhost:9090/rest/v1/export-bill-detail/add-export-bill-detail";
       axios
         .post(path, payload)
         .then((response) => response.data)
         .then((res) => {
           if (res.resultCode == "999") {
             this.$toaster.error(res.message);
-            this.deleteImportBill();
+            this.deleteExportBill();
+
           } else if (res.resultCode == "0") {
-            this.$toaster.success("Thành công!");
-            console.log(this.arrObj, "DATA1111");
+             this.$toaster.success("Thành công!");
           }
-          this.getImportBill();
-          
+          this.getExportBill();
         })
         .catch((error) => {
-          this.getImportBill();
+          this.getExportBill();
           console.log(error);
         });
     },
-    onSubmitImportBillDetail() {
-      this.AddImportBillDetail(this.arrObj);
+    onSubmitExportBillDetail(){
       
-       this.onResetArray();
-        this.$refs.AddImportBillDetailModel.hide();
+      this.AddExportBillDetail( this.arrObj)
+      this.onResetArray();
+       this.$refs.AddExportBillDetailModel.hide();
     },
 
-    addArrayImportBillDetail(payload) {
-      payload.commodity = this.commodityOptions.find(
-        (i) => i.code == payload.commodityCode
-      ).name;
-      const availabeCommodity = this.items1.find(
-        (i) => i.commodityCode == payload.commodityCode
-      );
+    addArrayExportBillDetail(payload) {
+      payload.commodity = this.commodityOptions.find(i => i.commodityCode == payload.commodityCode).commodityName;
+      const availabeCommodity = this.items1.find(i => i.commodityCode == payload.commodityCode);
       var obj = JSON.parse('{"data" :[]}');
-      if (availabeCommodity) {
-        availabeCommodity.quantity =
-          parseInt(availabeCommodity.quantity) + parseInt(payload.quantity);
-        availabeCommodity.price = payload.price;
-        console.log(this.items1, "ấdhfkaljsdhfkajsah");
-        obj.data = JSON.parse(JSON.stringify(this.items1));
-      } else {
-        this.items1 = [...this.items1, payload];
-        obj.data = JSON.parse(JSON.stringify(this.items1));
+      if(availabeCommodity){
+          availabeCommodity.quantity = parseInt(availabeCommodity.quantity) + parseInt(payload.quantity);
+          availabeCommodity.price = payload.price;
+          console.log(this.items1);
+          obj.data = JSON.parse(JSON.stringify(this.items1));
+      }else{
+          this.items1 = [...this.items1, payload];
+          obj.data = JSON.parse(JSON.stringify(this.items1));
       }
       this.arrObj = obj;
-      console.log(this.arrObj, " arr Data");
-      console.log(obj, "arrdefaut");
-
+    //   console.log(this.arrObj , " arr Data");
+    //   console.log(obj , "arrdefaut");
+      
       // spread operator ES6
+     
     },
     submitAdd(event) {
       event.preventDefault();
@@ -707,21 +623,39 @@ export default {
         quantity: this.form1.quantity,
         price: this.form1.price,
       };
-      console.log(payload, "PAYLOAD");
-      this.addArrayImportBillDetail(payload);
+      this.addArrayExportBillDetail(payload);
     },
 
-    deleteItem(index){
-      console.log(index);
-      this.items1.splice(index, 1);
-      // this.items1 = this.items1.filter((x, xIndex) => xIndex !== index);
-    },
 
+    
+   
+    // edit(id) {
+    //   this.isEdit = id;
+    //   axios
+    //     .get(`http://localhost:9090/rest/v1/category/` + id)
+    //     .then((res) => res.data)
+    //     .then((response) => {
+    //       console.log("response", response);
+    //       this.editform.id = response.object.id;
+    //       this.editform.name = response.object.name;
+    //       this.editform.code = response.object.code;
+    //       this.editform.status = response.object.status;
+    //       console.log(this.editform.id);
+    //     });
+    // },
+
+    onResetArray(){
+      this.items1 = [];
+      this.form1.commodityCode = ""
+      this.form1.quantity = ""
+      this.form1.price = ""
+    },
+    
 
     onReset() {
       // Reset our form values
       this.form.warehouseCode = "";
-      this.form.supplierCode = "";
+      this.form.agencyCode = "";
     },
     info(item, index, button) {
       this.infoModal.title = `Row index: ${index}`;

@@ -7,23 +7,41 @@
             <div class="items-click-add">
               <h3>Danh sách Người dùng</h3>
               <div>
-                <div class="pseudo-search">
-                  <!--   @keyup="onSeach()"
-                    v-model="searchit_form.material_name" -->
-                  <input
-                    type="text"
-                    placeholder="Tìm kiếm..."
-                    autofocus
-                    required
-                  />
-                  <button class="fa fa-search" type="submit"></button>
-                </div>
+                <b-button v-b-modal.modal-2 variant="success">
+                  <i class="fas fa-filter"/></b-button>
+                <b-modal id="modal-2" hide-footer ref="Model_filter">
+                  <b-form @submit="onSearch" v-if="show">
+                    <b-form-group id="input-group-1" label="Tên đại lý.">
+                      <b-form-input
+                        placeholder="Nhập tên đại lý"
+                        v-model="search.name"
+                        type="text"
+                      ></b-form-input>
 
-                <b-button v-b-modal.modal-1 variant="success"
+                      <div style="margin-top: 20px">
+                        <b-form-group
+                          id="input-group-1"
+                          label="Trạng thái"
+                          label-for="input-1"
+                        >
+                          <b-form-select
+                            
+                            v-model="search.status"
+                            :options="options1"
+                          >
+                          </b-form-select>
+                        </b-form-group>
+                      </div>
+                    </b-form-group>
+                    <b-button type="submit" variant="success">Lọc</b-button>
+                  </b-form>
+                </b-modal>
+
+                <b-button class="m-1" v-b-modal.modal-1 variant="success"
                   >Thêm mới</b-button
                 >
 
-                <b-modal id="modal-1" title="Thêm người dùng" ref="ModalAdd">
+                <b-modal id="modal-1" hide-footer title="Thêm người dùng" ref="ModalAdd">
                   <div>
                     <b-form @submit="onSubmit" v-if="show">
                       <b-form-group
@@ -112,10 +130,17 @@
                         >
                         </b-form-select>
                       </b-form-group>
-                      <b-button type="submit" variant="success"
-                        >Xác Nhận</b-button
-                      >
-                      <b-button type="reset" variant="light">Đóng</b-button>
+                      <div class="d-flex justify-content-end">
+                        <b-button class="m-1" type="submit" variant="success"
+                          >Xác Nhận</b-button
+                        >
+                        <b-button
+                          class="m-1"
+                          @click="$bvModal.hide('modal-1')"
+                          variant="light"
+                          >Đóng</b-button
+                        >
+                      </div>
                     </b-form>
                   </div>
                 </b-modal>
@@ -139,21 +164,21 @@
                       <template v-slot:cell(gender)="row">
                         <b-badge v-if="row.item.gender" variant="success">Nữ</b-badge
                         >
-                        <b-badge v-else variant="warning">Nam</b-badge>
+                        <b-badge v-else variant="success">Nam</b-badge>
                       </template>
                       <template #cell(actions)="row">
-                        <b-button v-b-modal.my-modal @click="edit(row.item.id)">
-                          Sửa
+                        <b-button class="m-1" variant="danger" v-b-modal.my-modal @click="edit(row.item.id)">
+                        <i class="fas fa-edit"></i>
                         </b-button>
-                        <b-button @click="ItemDelete(row.item.id)">
-                          Xóa
+                        <b-button class="m-1" variant="warning" @click="ItemDelete(row.item.id)">
+                         <i class="far fa-trash-alt"></i>
                         </b-button>
                       </template>
                       <template v-slot:cell(status)="row">
-                        <b-badge v-if="row.item.status" variant="success"
-                          >Không hoạt động</b-badge
+                        <b-badge v-if="row.item.status" variant="warning"
+                          >Ngừng hoạt động</b-badge
                         >
-                        <b-badge v-else variant="warning"
+                        <b-badge v-else variant="success"
                           >Hoạt Động</b-badge
                           >
                       </template>
@@ -174,7 +199,7 @@
                     id="my-modal"
                     ref="editSupModal"
                     title="Thông tin nguyên liệu"
-                    ok-only
+                    hide-footer
                   >
                     <pre></pre>
                     <div>
@@ -203,6 +228,7 @@
                               v-model="editform.email"
                               type="email"
                               placeholder="Nhập email"
+                              disabled
                               required
                             ></b-form-input>
                           </b-form-group>
@@ -272,14 +298,17 @@
                           <!-- Show Modal Nguyên Liệu -->
 
                           <!-- Button Click Submit -->
-                          <div class="link-btn">
-                            <b-button type="submit" variant="success"
-                              >Xác Nhận</b-button
-                            >
-                            <b-button type="reset" variant="light"
-                              >Đóng</b-button
-                            >
-                          </div>
+                          <div class="d-flex justify-content-end">
+                        <b-button class="m-1" type="submit" variant="success"
+                          >Xác Nhận</b-button
+                        >
+                        <b-button
+                          class="m-1"
+                          @click="$bvModal.hide('my-modal')"
+                          variant="light"
+                          >Đóng</b-button
+                        >
+                      </div>
                         </b-form>
                       </div>
                     </div>
@@ -296,6 +325,7 @@
 </template>
 <script>
 import axios from "axios";
+import Toasted from 'vue-toasted';
 import {
   Dropdown,
   DropdownItem,
@@ -314,6 +344,11 @@ export default {
   },
   data() {
     return {
+
+      search: {
+        name: "",
+        status: null,
+      },
       meterialdetail: {
         meterial: "",
       },
@@ -327,7 +362,7 @@ export default {
 
       selected: null,
       options1: [
-        { value: null, text: "Chọn giới tính" },
+        { value: null, text: "Chọn trạng thái" },
         { value: 0, text: "Hoạt động" },
         { value: 1, text: "Ngừng hoạt động" },
       ],
@@ -342,7 +377,7 @@ export default {
         fullName: "",
         email: "",
         password: "",
-        gender: "",
+        gender: null,
         address: "",
         phoneNumber: "",
         roleCode: "",
@@ -351,12 +386,11 @@ export default {
         id: "",
         fullName: "",
         email: "",
-        password: "",
         gender: "",
         address: "",
         phoneNumber: "",
         roleCode: "",
-        status: "",
+        status: null,
       },
 
       infoModal: {
@@ -432,11 +466,16 @@ export default {
     },
     ItemDelete(id) {
       const path = `http://localhost:9090/rest/v1/admin/user/remove-user/` + id;
-
-      axios
+      if(confirm("Bạn có chắc chắn muốn xóa?")){
+          axios
         .put(path)
+         .then((response) => response.data)
         .then((res) => {
-          console.log(res);
+          if (res.resultCode == "999") {
+            this.$toaster.error(res.message);
+          } else if (res.resultCode == "0") {
+             this.$toaster.success("Thành công!");
+          }
           this.getUser();
 
           // this.$toaster.success("Đã xóa nguyên liệu thành công");
@@ -447,42 +486,16 @@ export default {
         .catch((error) => {
           // eslint-disable-next-line
         });
+      }
+      
     },
 
-    //SEARCH METERIAL
-    // searchItem(payload) {
-    //   const path = "http://127.0.0.1:8000/material/search_material/";
-    //   axios
-    //     .post(path, payload)
-    //     .then((res) => {
-    //       this.items = res.data.data.map((material) => {
-    //         return {
-    //           mã_nguyên_liệu: material.id,
-    //           tên_nguyên_liệu: material.material_name,
-    //         };
-    //       });
-    //     })
-
-    //     .catch((error) => {
-    //       // this.getSuplier();
-    //       console.log(error);
-    //     });
-    // },
-
-    // onSeach() {
-    //   const payload = {
-    //     material_name: this.searchit_form.material_name,
-    //   };
-
-    //   this.searchItem(payload);
-    // },
-    // GET ALL METERIAL
-    getUser() {
+    searchUser(payload) {
+      const path = "http://localhost:9090/rest/v1/admin/user/search";
       axios
-        .get(`http://localhost:9090/rest/v1/admin/user/list`)
-        .then((response) => response.data)
+        .post(path, payload)
         .then((res) => {
-          this.items = res.object.map((user) => {
+          this.items = res.data.object.map((user) => {
             return {
               id: user.id,
               fullName: user.fullName,
@@ -494,6 +507,45 @@ export default {
               status: user.status,
             };
           });
+        })
+        .catch((error) => {
+          
+          console.log(error);
+        });
+    },
+    onSearch() {
+      const payload = {
+        name: this.search.name,
+        status: this.search.status,
+      };
+      console.log(payload);
+      this.searchUser(payload);
+      this.$refs["Model_filter"].hide();
+    },
+    // GET ALL METERIAL
+    getUser() {
+      axios
+        .get(`http://localhost:9090/rest/v1/admin/user/list`)
+        .then((response) => response.data)
+        .then((res) => {
+          if ((res.resultCode == "401")) {
+            this.$toaster.error("Vui lòng đăng nhập trước khi vào trang này!");
+          } else {
+            this.items = res.object.map((user) => {
+            return {
+              id: user.id,
+              fullName: user.fullName,
+              email: user.email,
+              address: user.address,
+              phoneNumber: user.phoneNumber,
+              gender: user.gender,
+              role: user.roleName,
+              status: user.status,
+            };
+            });
+          }
+        }).catch((error) => {
+          this.$toaster.error("Bạn không có quyền truy cập vào trang này!");
         });
     },
     // ADD METERIAL
@@ -501,7 +553,13 @@ export default {
       const path = "http://localhost:9090/rest/v1/admin/user/add-user";
       axios
         .post(path, payload)
+         .then((response) => response.data)
         .then((res) => {
+          if (res.resultCode == "999") {
+            this.$toaster.error(res.message);
+          } else if (res.resultCode == "0") {
+             this.$toaster.success("Thành công!");
+          }
           this.getUser();
         })
         .catch((error) => {
@@ -544,23 +602,24 @@ export default {
           this.editform.address = response.object.address;
           this.editform.status = response.object.status;
           this.editform.gender = response.object.gender;
-          console.log(this.editform.id);
         });
     },
     update() {
       axios
-        .put(
-          `http://localhost:9090/rest/v1/user/admin/edit-user`,
-          this.editform,
-          {},
-          console.log(this.isEdit, "Id Update"),
-          console.log(this.editform, "Form")
-        )
+        .put(`http://localhost:9090/rest/v1/admin/user/edit-user`,this.editform, {})
+        .then((response) => response.data)
         .then((res) => {
           console.log(res);
+          if (res.resultCode == "999") {
+            this.$toaster.error(res.message);
+          } else if (res.resultCode == "0") {
+             this.$toaster.success("Thành công!");
+             this.$refs.editSupModal.hide();
+          }
           this.getUser();
         })
         .catch((err) => {
+          console.log(err);
           this.$refs.editSupModal.hide();
         });
     },

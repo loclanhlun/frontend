@@ -9,6 +9,9 @@
   export default {}
 </script>
 <style lang="scss">
+button[type="submit"]{
+  margin-right: 20px;
+}
   .vue-notifyjs.notifications{
     .list-move {
       transition: transform 0.3s, opacity 0.4s;

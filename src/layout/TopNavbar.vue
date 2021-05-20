@@ -1,8 +1,8 @@
 <template>
   <nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">Dashboard</a>
-      <button type="button"
+     <!-- <a class="navbar-brand" href="#">Dashboard</a>-->
+      <!--<button type="button"
               class="navbar-toggler navbar-toggler-right"
               :class="{toggled: $sidebar.showSidebar}"
               aria-controls="navigation-index"
@@ -55,10 +55,13 @@
             <a class="dropdown-item" href="#">Separated link</a>
           </base-dropdown>
           <li class="nav-item">
-          <a href="http://localhost:8080/#/login" @click="LogOut()">Log out</a>
+          
           </li>
         </ul>
-      </div>
+        
+      </div>-->
+      <div class="collapse navbar-collapse justify-content-end">
+            <a href="http://localhost:8080/#/login"   @click="LogOut()"><b-icon icon="power" aria-hidden="true"></b-icon> Log out</a></div>
     </div>
   </nav>
 </template>

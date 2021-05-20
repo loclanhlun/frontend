@@ -20,6 +20,7 @@ import store from './store'
 import Vuex from 'vuex';
 import axios from 'axios' 
 import moment from 'vue-moment'
+import VueSweetalert2 from 'vue-sweetalert2';
 
 // LightBootstrap plugin
 import LightBootstrap from './light-bootstrap-main'
@@ -35,6 +36,7 @@ import './registerServiceWorker'
 Vue.use(Vuex)
 Vue.use(VueRouter)
 Vue.use(LightBootstrap)
+Vue.use(VueSweetalert2);
 
 
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
@@ -61,6 +63,40 @@ const router = new VueRouter({
   }
 })
 
+router.beforeEach((to, from, next) => {
+  const authorizedRoles = to.meta;
+  let userRole = '';
+  // not use var --> scope
+  const auth = JSON.parse(window.localStorage.getItem('auth')); 
+  if(auth && auth.object && auth.object.role) {
+    userRole = auth.object.role; 
+  }
+
+  if(authorizedRoles) {
+    if(!userRole) {
+      if(to.path === "/login") {
+        next();
+      }
+      return next({
+        path: '/login',
+        query: {
+          returnUrl: to.path
+        }
+      })
+    }
+
+    if(authorizedRoles.length && !authorizedRoles.includes(userRole)) {
+      return next({
+        path: '/not-found',
+        query: {
+          returnUrl: to.path
+        }
+      })
+    }
+  }
+  next();
+})
+
 let token = JSON.parse(window.localStorage.getItem('auth'))
 
 
@@ -75,3 +111,4 @@ new Vue({
   router,
   store
 })
+

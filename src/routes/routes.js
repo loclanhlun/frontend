@@ -18,6 +18,8 @@ import Notifications from 'src/pages/Notifications.vue'
 import Upgrade from 'src/pages/Upgrade.vue'
 import Login from 'src/layout/Login.vue'
 import ImportBillList from 'src/pages/ImportBillList.vue'
+import ExportBillList from 'src/pages/ExportBillList.vue'
+import CommodityWarehouse from 'src/pages/CommodityWarehouse.vue'
 
 const routes = [
 
@@ -25,8 +27,7 @@ const routes = [
  
   {
     path: '/',
-    component: DashboardLayout,
-    redirect: '/admin/overview'
+    component: Login
   },
   {
     path: '/admin',
@@ -41,37 +42,50 @@ const routes = [
       {
         path: 'user',
         name: 'User',
-        component: UserProfile
+        component: UserProfile,
+        
       },
       {
         path: 'commodity-list',
         name: 'Commodity List',
-        component: CommodityList
+        component: CommodityList,
+        meta: ['ROLE_ADMIN']
       },
       {
         path: 'category-list',
         name: 'Category List',
-        component: CategoryList
+        component: CategoryList,
+        meta: ['ROLE_ADMIN']
       },
       {
         path: 'supplier-list',
         name: 'Supplier List',
-        component: SupplierList
+        component: SupplierList,
+        meta: ['ROLE_ADMIN']
       },
       {
         path: 'warehouse-list',
         name: 'Warehouse List',
-        component: WarehouseList
+        component: WarehouseList,
+        meta: ['ROLE_ADMIN']
       },
       {
         path: 'agency-list',
         name: 'Agency List',
-        component: AgencyList
+        component: AgencyList,
+        meta: ['ROLE_ADMIN']
       },
       {
         path: 'user-list',
         name: 'User List',
-        component: UserList
+        component: UserList,
+        meta: ['ROLE_ADMIN']
+      },
+
+      {
+        path: 'commoditywarehouse-list',
+        name: 'CommodityWarehouse List',
+        component: CommodityWarehouse
       },
 
       {
@@ -104,7 +118,17 @@ const routes = [
         name: 'Import List',
         component: ImportBillList
       },
-      
+
+      {
+        path: 'export-bill',
+        name: 'Export List',
+        component: ExportBillList
+      },
+      {
+        path: 'not-found',
+        name: 'Not Found',
+        component: NotFound
+      }
     ]
   },  
   { path: '*', component: NotFound },
@@ -112,7 +136,8 @@ const routes = [
   {
     path: '/login',
     name: 'Login',
-    component: Login
+    component: Login,
+    meta: []
   },
 
   

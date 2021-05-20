@@ -3,13 +3,13 @@ import SidebarLink from './SidebarLink.vue'
 
 const SidebarStore = {
   showSidebar: false,
-  sidebarLinks: [
-    {
-      name: 'Dashboard',
-      icon: 'ti-panel',
-      path: '/admin/overview'
-    }
-  ],
+  // sidebarLinks: [
+  //   {
+  //     name: 'Dashboard',
+  //     icon: 'ti-panel',
+  //     path: '/admin/overview'
+  //   }
+  // ],
   displaySidebar (value) {
     this.showSidebar = value
   }

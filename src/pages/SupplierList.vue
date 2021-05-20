@@ -7,9 +7,9 @@
             <div class="items-click-add">
               <h3>Danh sách nhà cung cấp</h3>
               <div>
-                <div class="pseudo-search">
-                  <!--   @keyup="onSeach()"
-                    v-model="searchit_form.material_name" -->
+               <!-- <div class="pseudo-search">
+                    @keyup="onSeach()"
+                    v-model="searchit_form.material_name" 
                   <input
                     type="text"
                     placeholder="Tìm kiếm..."
@@ -17,13 +17,41 @@
                     required
                   />
                   <button class="fa fa-search" type="submit"></button>
-                </div>
+                </div> -->
+                <b-button v-b-modal.modal-2 variant="success">
+                  <i class="fas fa-filter"/></b-button>
+                <b-modal id="modal-2" hide-footer ref="Model_filter">
+                  <b-form @submit="onSearch" v-if="show">
+                    <b-form-group id="input-group-1" label="Tên đại lý.">
+                      <b-form-input
+                        placeholder="Nhập tên đại lý"
+                        v-model="search.name"
+                        type="text"
+                      ></b-form-input>
 
+                      <div style="margin-top: 20px">
+                        <b-form-group
+                          id="input-group-1"
+                          label="Trạng thái"
+                          label-for="input-1"
+                        >
+                          <b-form-select
+                            
+                            v-model="search.status"
+                            :options="options1"
+                          >
+                          </b-form-select>
+                        </b-form-group>
+                      </div>
+                    </b-form-group>
+                    <b-button type="submit" variant="success">Lọc</b-button>
+                  </b-form>
+                </b-modal>
                 <b-button v-b-modal.modal-1 variant="success"
                   >Thêm mới</b-button
                 >
 
-                <b-modal id="modal-1" title="Thêm nhà cung cấp" ref="ModalAdd">
+                <b-modal id="modal-1" title="Thêm nhà cung cấp" ref="ModalAdd" hide-footer>
                   <div>
                     <b-form @submit="onSubmit" v-if="show">
                       <b-form-group
@@ -74,10 +102,13 @@
                           required
                         ></b-form-input>
                       </b-form-group>
-                      <b-button type="submit" variant="success"
+                       <div class="d-flex justify-content-end">
+                       <b-button class="m-1" type="submit" variant="success"
                         >Xác Nhận</b-button
                       >
-                      <b-button type="reset" variant="light">Đóng</b-button>
+                      <b-button class="m-1" @click="$bvModal.hide('modal-1')" variant="light">Đóng</b-button>
+                       </div>
+                      
                     </b-form>
                   </div>
                 </b-modal>
@@ -99,12 +130,20 @@
                       :fields="fields"
                     >
                       <template #cell(actions)="row">
-                        <b-button v-b-modal.my-modal @click="edit(row.item.id)">
-                          Sửa
+                        <b-button class="m-1" variant="danger" v-b-modal.my-modal @click="edit(row.item.id)">
+                          <i class="fas fa-edit"></i>
                         </b-button>
-                        <b-button @click="ItemDelete(row.item.id)">
-                          Xóa
+                        <b-button class="m-1" variant="warning" @click="ItemDelete(row.item.id)">
+                          <i class="far fa-trash-alt"></i>
                         </b-button>
+                      </template>
+                      <template v-slot:cell(status)="row">
+                        <b-badge v-if="row.item.status" variant="warning"
+                          >Ngừng giao dịch</b-badge
+                        >
+                        <b-badge v-else variant="success"
+                          >Giao dịch</b-badge
+                          >
                       </template>
                     </b-table>
                     <b-card-footer class="py-4 d-flex justify-content-start">
@@ -124,6 +163,7 @@
                     ref="editSupModal"
                     title="Thông tin nguyên liệu"
                     ok-only
+                    hide-footer
                   >
                     <pre></pre>
                     <div>
@@ -193,13 +233,16 @@
                           <!-- Show Modal Nguyên Liệu -->
 
                           <!-- Button Click Submit -->
-                          <div class="link-btn">
-                            <b-button type="submit" variant="success"
+                          <div class="d-flex justify-content-end">
+                            <b-button class="m-1" type="submit" variant="success"
                               >Xác Nhận</b-button
                             >
-                            <b-button type="reset" variant="light"
-                              >Đóng</b-button
-                            >
+                            <b-button 
+                            class="m-1"
+                          @click="$bvModal.hide('my-modal')"
+                          variant="light"
+                          >Đóng</b-button
+                        >
                           </div>
                         </b-form>
                       </div>
@@ -217,6 +260,7 @@
 </template>
 <script>
 import axios from "axios";
+import Toasted from 'vue-toasted';
 import {
   Dropdown,
   DropdownItem,
@@ -235,13 +279,18 @@ export default {
   },
   data() {
     return {
+
+      search: {
+        name: "",
+        status: null,
+      },
       meterialdetail: {
         meterial: "",
       },
 
       selected: null,
       options1: [
-        { value: null, text: "Please select an option" },
+        { value: null, text: "Chọn trạng thái" },
         { value: 0, text: "Còn giao dịch" },
         { value: 1, text: "Ngừng giao dịch" },
       ],
@@ -317,59 +366,31 @@ export default {
 
   methods: {
     ItemDelete(id) {
-      const path =
-        `http://localhost:9090/rest/v1/admin/supplier/remove-supplier/` + id;
-
-      axios
+      const path = `http://localhost:9090/rest/v1/admin/supplier/remove-supplier/` + id;
+      if(confirm("Bạn có chắc chắn muốn xóa?")){
+          axios
         .put(path)
-        .then((res) => {
-          console.log(res);
-          this.getSupplier();
-
-          // this.$toaster.success("Đã xóa nguyên liệu thành công");
-
-          // this.message = 'Book removed!';
-          // this.showMessage = true;
-        })
-        .catch((error) => {
-          // eslint-disable-next-line
-        });
-    },
-
-    //SEARCH METERIAL
-    // searchItem(payload) {
-    //   const path = "http://127.0.0.1:8000/material/search_material/";
-    //   axios
-    //     .post(path, payload)
-    //     .then((res) => {
-    //       this.items = res.data.data.map((material) => {
-    //         return {
-    //           mã_nguyên_liệu: material.id,
-    //           tên_nguyên_liệu: material.material_name,
-    //         };
-    //       });
-    //     })
-
-    //     .catch((error) => {
-    //       // this.getSuplier();
-    //       console.log(error);
-    //     });
-    // },
-
-    // onSeach() {
-    //   const payload = {
-    //     material_name: this.searchit_form.material_name,
-    //   };
-
-    //   this.searchItem(payload);
-    // },
-    // GET ALL METERIAL
-    getSupplier() {
-      axios
-        .get(`http://localhost:9090/rest/v1/admin/supplier/list`)
         .then((response) => response.data)
         .then((res) => {
-          this.items = res.object.map((supplier) => {
+          if (res.resultCode == "999") {
+            this.$toaster.error(res.message);
+          } else if (res.resultCode == "0") {
+             this.$toaster.success("Thành công!");
+          }
+          this.getSupplier();
+        })
+        .catch((error) => {
+        });
+      }
+      
+    },
+
+    searchSupplier(payload) {
+      const path = "http://localhost:9090/rest/v1/admin/supplier/search";
+      axios
+        .post(path, payload)
+        .then((res) => {
+          this.items = res.data.object.map((supplier) => {
             return {
               id: supplier.id,
               code: supplier.code,
@@ -379,6 +400,43 @@ export default {
               status: supplier.status,
             };
           });
+        })
+        .catch((error) => {
+          
+          console.log(error);
+        });
+    },
+    onSearch() {
+      const payload = {
+        name: this.search.name,
+        status: this.search.status,
+      };
+      console.log(payload);
+      this.searchSupplier(payload);
+      this.$refs["Model_filter"].hide();
+    },
+    // GET ALL METERIAL
+    getSupplier() {
+      axios
+        .get(`http://localhost:9090/rest/v1/admin/supplier/list`)
+        .then((response) => response.data)
+        .then((res) => {
+          if ((res.resultCode == "401")) {
+            this.$toaster.error("Vui lòng đăng nhập trước khi vào trang này!");
+          } else {
+            this.items = res.object.map((supplier) => {
+            return {
+              id: supplier.id,
+              code: supplier.code,
+              name: supplier.name,
+              phoneNumber: supplier.phoneNumber,
+              address: supplier.address,
+              status: supplier.status,
+            };
+            });
+          }
+        }).catch((error) => {
+          this.$toaster.error("Bạn không có quyền truy cập vào trang này!");
         });
     },
     // ADD METERIAL
@@ -386,7 +444,13 @@ export default {
       const path = "http://localhost:9090/rest/v1/admin/supplier/add-supplier";
       axios
         .post(path, payload)
+        .then((response) => response.data)
         .then((res) => {
+          if (res.resultCode == "999") {
+            this.$toaster.error(res.message);
+          } else if (res.resultCode == "0") {
+             this.$toaster.success("Thành công!");
+          }
           this.getSupplier();
         })
         .catch((error) => {
@@ -435,8 +499,14 @@ export default {
           console.log(this.isEdit, "Id Update"),
           console.log(this.editform, "Form")
         )
+        .then((response) => response.data)
         .then((res) => {
-          console.log(res);
+          if (res.resultCode == "999") {
+            this.$toaster.error(res.message);
+          } else if (res.resultCode == "0") {
+             this.$toaster.success("Thành công!");
+             this.$refs.editSupModal.hide();
+          }
           this.getSupplier();
         })
         .catch((err) => {
@@ -448,7 +518,8 @@ export default {
       // Reset our form values
       this.form.name = "";
       this.form.code = "";
-      this.form.categoryid = "";
+      this.form.phoneNumber = "";
+      this.form.address = "";
     },
     info(item, index, button) {
       this.infoModal.title = `Row index: ${index}`;

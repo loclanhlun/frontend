@@ -14,6 +14,7 @@
     width: 100%;
 }
 
+
 .typography-line span {
     bottom: 10px;
     color: #9A9A9A;
@@ -825,4 +826,8 @@
 
 .documentation .dropdown .dropdown-menu.show {
     transform: translate3d(0, 39px, 0) !important;
+}
+
+.table > thead > tr > th:last-child, .table > tbody > tr > th:last-child, .table > tfoot > tr > th:last-child, .table > thead > tr > td:last-child, .table > tbody > tr > td:last-child, .table > tfoot > tr > td:last-child {
+    width: auto
 }
